@@ -25,8 +25,8 @@ function getLocation(ip) {
     let search = "http://api.ipstack.com/" + ip
         + "?access_key=" + "938aa5bb84712b5de3034380f0b490d6"
         + "&fields=latitude,longitude";
-    console.log(search);
-    fetch(search, {
+    console.log("F" + ip);
+    fetch("http://api.ipstack.com/86.246.79.246?access_key=938aa5bb84712b5de3034380f0b490d6&fields=latitude,longitude", {
         method: 'GET',
         headers: {'Content-Type': 'application/json'}})
         .then(response => {
