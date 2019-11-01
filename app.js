@@ -57,7 +57,7 @@ const text = 'INSERT INTO IP_INFO(ADDRESS, LATITUDE, LONGITUDE) VALUES($1, $2, $
 async function saveToDb(ip, latitude, longitude) {
     const values = [ip, latitude, longitude]
     try {
-        const res = await pool.query(text, values)
+        const res = await client.query(text, values)
         console.log(res.rows[0])
         return res.rows[0];
     } catch (err) {
