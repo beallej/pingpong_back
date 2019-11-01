@@ -5,7 +5,6 @@ let fetch = require('node-fetch');
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-const port = 3000;
 
 
 app.post('/sendIp',function(request, response){
@@ -18,7 +17,7 @@ app.post('/sendIp',function(request, response){
 
 });
 
-app.listen(port, () =>{})
+app.listen(process.env.PORT || 5000, () =>{})
 
 //CHANGE ONCE WORKING
 function getLocation(ip) {
