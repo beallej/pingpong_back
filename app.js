@@ -17,7 +17,7 @@ client.connect();
 
 
 
-app.post('/sendIp',async function(request, response){
+app.post('/ip/add',async function(request, response){
     let ip = request.body.ip;
     ip =  ip.trim()  //remove extra newline char
 
@@ -33,6 +33,12 @@ app.post('/sendIp',async function(request, response){
     return response
 
 });
+
+app.get('/ip/all', async function (request, response) {
+    let allIpInfo = await getAllData();
+    console.log(allIpInfo)
+    return allIpInfo;
+})
 
 app.listen(process.env.PORT || 5000, () =>{})
 
@@ -68,3 +74,14 @@ async function saveToDb(ip, latitude, longitude) {
     }
 }
 
+async function getAllData() {
+    try {
+        const qry = 'SELECT * FROM IP_INFO';
+        const res = await client.query(text)
+        console.log(res.rows)
+        return res.rows;
+    } catch (err) {
+        console.log("error querying to db", err.stack)
+        return null;
+    }
+}
