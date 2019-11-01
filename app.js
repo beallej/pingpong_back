@@ -1,10 +1,19 @@
 const express = require('express')
 var bodyParser  = require("body-parser");
 let fetch = require('node-fetch');
+const pg = require('pg');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+const { Client } = require('pg');
+const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
+});
+
+client.connect();
+
 
 
 app.post('/sendIp',async function(request, response){
@@ -12,6 +21,7 @@ app.post('/sendIp',async function(request, response){
     let location = await getLocation(ip);
     console.log("ip: " , ip);
     console.log("location: ", location);
+    let dbRes = await saveToDb(ip, location);
     response.status = 200;
     return response
 
@@ -19,9 +29,7 @@ app.post('/sendIp',async function(request, response){
 
 app.listen(process.env.PORT || 5000, () =>{})
 
-//CHANGE ONCE WORKING
 async function getLocation(ip) {
-    // let fakeIp = "2a01:cb04:a33:c00:1eb:4711:4a98:1ce2"
     let search = "http://api.ipstack.com/" + ip.trim()
         + "?access_key=" + "938aa5bb84712b5de3034380f0b490d6"
         + "&fields=latitude,longitude";
@@ -46,3 +54,16 @@ async function getLocation(ip) {
             return null;
         });
 }
+
+const text = 'INSERT INTO IP_INFO(ADDRESS, LATITUDE, LONGITUDE) VALUES($1, $2, $3) RETURNING *';
+async function saveToDb(ip, location) {
+    const values = [ip, location.latitude, location.longitude]
+    try {
+        const res = await pool.query(text, values)
+        console.log(res.rows[0])
+        return res.rows[0];
+    } catch (err) {
+        console.log(err.stack)
+    }
+}
+
