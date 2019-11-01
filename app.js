@@ -18,7 +18,9 @@ client.connect();
 
 
 app.post('/sendIp',async function(request, response){
-    const ip = request.body.ip;
+    let ip = request.body.ip;
+    ip =  ip.trim()  //remove extra newline char
+
     let location = await getLocation(ip);
     console.log("ip: " , ip);
     console.log("location: ", location);
@@ -35,7 +37,7 @@ app.post('/sendIp',async function(request, response){
 app.listen(process.env.PORT || 5000, () =>{})
 
 async function getLocation(ip) {
-    let search = "http://api.ipstack.com/" + ip.trim()
+    let search = "http://api.ipstack.com/" + ip
         + "?access_key=" + "938aa5bb84712b5de3034380f0b490d6"
         + "&fields=latitude,longitude";
     console.log(search);
