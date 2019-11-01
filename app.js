@@ -22,11 +22,11 @@ app.listen(process.env.PORT || 5000, () =>{})
 //CHANGE ONCE WORKING
 function getLocation(ip) {
     // let fakeIp = "2a01:cb04:a33:c00:1eb:4711:4a98:1ce2"
-    let search = "http://api.ipstack.com/" + ip
+    let search = "http://api.ipstack.com/" + ip.trim()
         + "?access_key=" + "938aa5bb84712b5de3034380f0b490d6"
         + "&fields=latitude,longitude";
-    console.log("F" + ip);
-    fetch("http://api.ipstack.com/86.246.79.246?access_key=938aa5bb84712b5de3034380f0b490d6&fields=latitude,longitude", {
+    console.log(search);
+    fetch(search, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'}})
         .then(response => {
