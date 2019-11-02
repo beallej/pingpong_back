@@ -32,7 +32,7 @@ app.post('/ip/add',async function(request, response){
             status = 406;
         } else {
             dbRes = await saveToDb(ip, location.latitude, location.longitude);
-            status = 304;
+            status = 201;
         }
 
     } else {
