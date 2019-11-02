@@ -27,7 +27,7 @@ app.post('/ip/add',async function(request, response){
     let dbRes;
     if (location.latitude && location.longitude){
         if (location.country_code !== "FR") {
-            console.log("ip " + data.ip + " not in france, located in " + data.country_code)
+            console.log("ip " + location.ip + " not in france, located in " + location.country_code)
             response.status = 406;
         } else {
             dbRes = await saveToDb(ip, location.latitude, location.longitude);
@@ -72,12 +72,17 @@ async function getLocation(ip) {
     }
     return null
 }
-
-const text = 'INSERT INTO IP_INFO(ADDRESS, LATITUDE, LONGITUDE) VALUES($1, $2, $3) RETURNING *';
+const insertText = 'INSERT INTO IP_INFO(ADDRESS, LATITUDE, LONGITUDE) VALUES($1, $2, $3) RETURNING *';
+const existsText = 'SELECT * FROM IP_INFO WHERE ADDRESS = $1';
 async function saveToDb(ip, latitude, longitude) {
     const values = [ip, latitude, longitude]
     try {
-        const res = await client.query(text, values)
+        let res = await client.query(existsText, values)
+        if (res.rows.length > 0) {
+            console.log("ip already in db" + ip)
+            return null;
+        }
+        res = await client.query(insertText, values)
         console.log(res.rows[0])
         return res.rows[0];
     } catch (err) {
