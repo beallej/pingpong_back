@@ -41,6 +41,8 @@ app.get('/ip/all', async function (request, response) {
     let allIpInfo = await getAllData();
     console.log("all ip info: ", allIpInfo)
     response.status = 200;
+    response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com/");
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     return response.send(allIpInfo);
 })
 
