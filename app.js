@@ -26,7 +26,7 @@ app.post('/ip/add',async function(request, response){
     console.log("location: ", location);
     let dbRes;
     if (location.latitude && location.longitude){
-        if (location.country_code != "FR") {
+        if (location.country_code !== "FR") {
             console.log("ip " + data.ip + " not in france, located in " + data.country_code)
             response.status = 406;
         } else {
