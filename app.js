@@ -77,7 +77,7 @@ async function saveToDb(ip, latitude, longitude) {
 async function getAllData() {
     try {
         const qry = 'SELECT * FROM IP_INFO';
-        const res = await client.query(text)
+        const res = await client.query(qry)
         console.log(res.rows)
         return res.rows;
     } catch (err) {
