@@ -26,10 +26,12 @@ app.post('/ip/add',async function(request, response){
     console.log("location: ", location);
     if (location.latitude && location.longitude){
         let dbRes = await saveToDb(ip, location.latitude, location.longitude);
+        response.status = 304;
+
     } else {
-        console.log("location info null for ip: ", ip)
+        response.status = 404;
+        console.log("location info null for ip: ", ip);
     }
-    response.status = 200;
     return response
 
 });
@@ -37,7 +39,8 @@ app.post('/ip/add',async function(request, response){
 app.get('/ip/all', async function (request, response) {
     let allIpInfo = await getAllData();
     console.log("all ip info: ", allIpInfo)
-    return allIpInfo;
+    response.body = allIpInfo;
+    response.status = 200;
 })
 
 app.listen(process.env.PORT || 5000, () =>{})
