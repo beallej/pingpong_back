@@ -81,7 +81,7 @@ const existsText = 'SELECT * FROM IP_INFO WHERE ADDRESS = $1';
 async function saveToDb(ip, latitude, longitude) {
     const values = [ip, latitude, longitude]
     try {
-        let res = await client.query(existsText, values)
+        let res = await client.query(existsText, [ip])
         if (res.rows.length > 0) {
             console.log("ip already in db" + ip)
             return null;
