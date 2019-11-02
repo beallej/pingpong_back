@@ -41,6 +41,7 @@ app.get('/ip/all', async function (request, response) {
     console.log("all ip info: ", allIpInfo)
     response.body = allIpInfo;
     response.status = 200;
+    return response;
 })
 
 app.listen(process.env.PORT || 5000, () =>{})
