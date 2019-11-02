@@ -26,8 +26,13 @@ app.post('/ip/add',async function(request, response){
     console.log("location: ", location);
     let dbRes;
     if (location.latitude && location.longitude){
-        dbRes = await saveToDb(ip, location.latitude, location.longitude);
-        response.status = 304;
+        if (location.country_code != "FR") {
+            console.log("ip " + data.ip + " not in france, located in " + data.country_code)
+            response.status = 406;
+        } else {
+            dbRes = await saveToDb(ip, location.latitude, location.longitude);
+            response.status = 304;
+        }
 
     } else {
         response.status = 404;
@@ -53,7 +58,7 @@ app.listen(process.env.PORT || 5000, () =>{})
 async function getLocation(ip) {
     let search = "http://api.ipstack.com/" + ip
         + "?access_key=" + "938aa5bb84712b5de3034380f0b490d6"
-        + "&fields=latitude,longitude";
+        + "&fields=latitude,longitude,country_code";
     console.log(search);
     try {
         const response = await fetch(search, {
@@ -61,12 +66,11 @@ async function getLocation(ip) {
             headers: {'Content-Type': 'application/json'}
         });
         const data = await response.json();
-        return {latitude: data.latitude, longitude: data.longitude}
+        return data
     } catch(err) {
         console.log("error fetching location", err)
-        return null
     }
-
+    return null
 }
 
 const text = 'INSERT INTO IP_INFO(ADDRESS, LATITUDE, LONGITUDE) VALUES($1, $2, $3) RETURNING *';
