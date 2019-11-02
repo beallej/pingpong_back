@@ -25,32 +25,36 @@ app.post('/ip/add',async function(request, response){
     console.log("ip: " , ip);
     console.log("location: ", location);
     let dbRes;
+    let status = 200;
     if (location.latitude && location.longitude){
         if (location.country_code !== "FR") {
-            console.log("ip " + location.ip + " not in france, located in " + location.country_code)
-            response.status = 406;
+            console.log("ip " + ip + " not in france, located in " + location.country_code)
+            status = 406;
         } else {
             dbRes = await saveToDb(ip, location.latitude, location.longitude);
-            response.status = 304;
+            status = 304;
         }
 
     } else {
-        response.status = 404;
+        status = 404;
         console.log("location info null for ip: ", ip);
     }
     response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    return response.send(dbRes);
+    return response.status(status).send(dbRes);
 
 });
 
 app.get('/ip/all', async function (request, response) {
-    let allIpInfo = await getAllData();
-    console.log("all ip info: ", allIpInfo)
-    response.status = 200;
     response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    return response.send(allIpInfo);
+    try {
+        let allIpInfo = await getAllData();
+        console.log("all ip info: ", allIpInfo)
+        return response.status(200).send(allIpInfo);
+    } catch (err) {
+        return response.status(500).end();
+    }
 })
 
 app.listen(process.env.PORT || 5000, () =>{})
