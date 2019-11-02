@@ -36,7 +36,7 @@ app.post('/ip/add',async function(request, response){
 
 app.get('/ip/all', async function (request, response) {
     let allIpInfo = await getAllData();
-    console.log(allIpInfo)
+    console.log("all ip info: ", allIpInfo)
     return allIpInfo;
 })
 
