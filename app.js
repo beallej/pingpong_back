@@ -33,6 +33,8 @@ app.post('/ip/add',async function(request, response){
         response.status = 404;
         console.log("location info null for ip: ", ip);
     }
+    response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com");
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     return response.send(dbRes);
 
 });
