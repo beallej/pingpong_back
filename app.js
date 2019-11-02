@@ -24,24 +24,24 @@ app.post('/ip/add',async function(request, response){
     let location = await getLocation(ip);
     console.log("ip: " , ip);
     console.log("location: ", location);
+    let dbRes;
     if (location.latitude && location.longitude){
-        let dbRes = await saveToDb(ip, location.latitude, location.longitude);
+        dbRes = await saveToDb(ip, location.latitude, location.longitude);
         response.status = 304;
 
     } else {
         response.status = 404;
         console.log("location info null for ip: ", ip);
     }
-    return response
+    return response.send(dbRes);
 
 });
 
 app.get('/ip/all', async function (request, response) {
     let allIpInfo = await getAllData();
     console.log("all ip info: ", allIpInfo)
-    response.body = allIpInfo;
     response.status = 200;
-    return response;
+    return response.send(allIpInfo);
 })
 
 app.listen(process.env.PORT || 5000, () =>{})
