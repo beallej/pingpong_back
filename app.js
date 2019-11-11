@@ -33,7 +33,7 @@ app.post('/ip/add',async function(request, response){
             console.log("ip " + ip + " not in france, located in " + location.country_code)
             status = 406;
         } else {
-            dbRes = await saveToDb(ip, location.latitude, location.longitude, location.connection.asn, location.connection.isp);
+            dbRes = await saveToDb(ip, location.latitude, location.longitude, location.asn, location.isp);
             status = 201;
         }
 
