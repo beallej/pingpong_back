@@ -61,8 +61,8 @@ app.listen(process.env.PORT || 5000, () =>{})
 
 async function getLocation(ip) {
     let search = "http://api.ipstack.com/" + ip
-        + "?access_key=" + "938aa5bb84712b5de3034380f0b490d6&hostname=1"
-        + "&fields=latitude,longitude,country_code,asn,isp";
+        + "?access_key=" + "938aa5bb84712b5de3034380f0b490d6&hostname=1";
+        // + "&fields=latitude,longitude,country_code,asn,isp";
     console.log(search);
     try {
         const response = await fetch(search, {
