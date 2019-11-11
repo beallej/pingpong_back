@@ -31,7 +31,7 @@ app.post('/ip/add',async function(request, response){
             console.log("ip " + ip + " not in france, located in " + location.country_code)
             status = 406;
         } else {
-            dbRes = await saveToDb(ip, location.latitude, location.longitude);
+            dbRes = await saveToDb(ip, location.latitude, location.longitude, location.connection.asn, location.connection.isp);
             status = 201;
         }
 
@@ -62,7 +62,7 @@ app.listen(process.env.PORT || 5000, () =>{})
 async function getLocation(ip) {
     let search = "http://api.ipstack.com/" + ip
         + "?access_key=" + "938aa5bb84712b5de3034380f0b490d6"
-        + "&fields=latitude,longitude,country_code";
+        + "&fields=latitude,longitude,country_code,connection";
     console.log(search);
     try {
         const response = await fetch(search, {
@@ -76,10 +76,10 @@ async function getLocation(ip) {
     }
     return null
 }
-const insertText = 'INSERT INTO IP_INFO(ADDRESS, LATITUDE, LONGITUDE) VALUES($1, $2, $3) RETURNING *';
+const insertText = 'INSERT INTO IP_INFO(ADDRESS, LATITUDE, LONGITUDE, ASN, ISP) VALUES($1, $2, $3, $4, $5) RETURNING *';
 const existsText = 'SELECT * FROM IP_INFO WHERE ADDRESS = $1';
-async function saveToDb(ip, latitude, longitude) {
-    const values = [ip, latitude, longitude]
+async function saveToDb(ip, latitude, longitude, asn, isp) {
+    const values = [ip, latitude, longitude, asn, isp]
     try {
         let res = await client.query(existsText, [ip])
         if (res.rows.length > 0) {
