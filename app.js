@@ -2,6 +2,8 @@ const express = require('express')
 var bodyParser  = require("body-parser");
 let fetch = require('node-fetch');
 const { Client } = require('pg');
+const iplocate = require('node-iplocate');
+
 
 
 const app = express();
@@ -60,18 +62,19 @@ app.get('/ip/all', async function (request, response) {
 app.listen(process.env.PORT || 5000, () =>{})
 
 async function getLocation(ip) {
-    let search = "http://api.ipstack.com/" + ip
-        + "?access_key=" + "938aa5bb84712b5de3034380f0b490d6&hostname=1";
-        // + "&fields=latitude,longitude,country_code,asn,isp";
-    console.log(search);
+
+    iplocate(ip).then((results) => {
+        console.log(results);
+    });
     try {
-        const response = await fetch(search, {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'}
-        });
-        const data = await response.json();
-        console.log("data:", data)
-        return data
+        // const response = await fetch(search, {
+        //     method: 'GET',
+        //     headers: {'Content-Type': 'application/json'}
+        // });
+        // const data = await response.json();
+        // console.log("data:", data)
+        const data = await iplocate(ip);
+        return {latitude: data.latitude, longitude: data.longitude, country_code: data.country_code, asn: data.asn, isp: data.org}
     } catch(err) {
         console.log("error fetching location", err)
     }
