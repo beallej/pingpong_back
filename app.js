@@ -3,6 +3,8 @@ var bodyParser  = require("body-parser");
 let fetch = require('node-fetch');
 const { Client } = require('pg');
 const iplocate = require('node-iplocate');
+var redis = require('redis');
+// var client = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
 
 
 
@@ -17,7 +19,47 @@ const client = new Client({
 
 client.connect();
 
+/*
+* {
+*   iplist: [{address: "213.248.70.0", hostname: "abc.def.com"} , {address: "213.248.70.2", hostname ':'sds.sds.com"}, etc... ],
+*   src: "123.45.56.7",
+*   dst: "344.234.23.3"
+* }
+* */
+app.post('/traceroute',async function(request, response){
+    // let ipList = request.body.ipList;
+    // let src = request.body.src.trim();
+    // let dst = request.body.dst.trim();
+    // ipList.map((ip) => {
+    //     let location = getLocation(ip.trim());
+    // })
 
+    console.log("BODY: " + request.body)
+    return response.status(200).end()
+
+    // let location = await getLocation(ip);
+    // console.log("ip: " , ip);
+    // console.log("location: ", location);
+    // let dbRes;
+    // let status = 200;
+    // if (location.latitude && location.longitude){
+    //     if (location.country_code !== "FR") {
+    //         console.log("ip " + ip + " not in france, located in " + location.country_code)
+    //         status = 406;
+    //     } else {
+    //         dbRes = await saveToDb(ip, location.latitude, location.longitude, location.asn, location.isp);
+    //         status = 201;
+    //     }
+    //
+    // } else {
+    //     status = 404;
+    //     console.log("location info null for ip: ", ip);
+    // }
+    // response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com");
+    // response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    // return response.status(status).send(dbRes);
+
+});
 
 app.post('/ip/add',async function(request, response){
     let ip = request.body.ip;
@@ -48,7 +90,7 @@ app.post('/ip/add',async function(request, response){
 });
 
 app.get('/ip/all', async function (request, response) {
-    response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com");
+    response.header("Access-Control-Allow-Origin", "*");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let allIpInfo = await getAllData();
@@ -67,12 +109,6 @@ async function getLocation(ip) {
         console.log(results);
     });
     try {
-        // const response = await fetch(search, {
-        //     method: 'GET',
-        //     headers: {'Content-Type': 'application/json'}
-        // });
-        // const data = await response.json();
-        // console.log("data:", data)
         const data = await iplocate(ip);
         return {latitude: data.latitude, longitude: data.longitude, country_code: data.country_code, asn: data.asn, isp: data.org}
     } catch(err) {

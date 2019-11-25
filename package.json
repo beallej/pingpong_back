@@ -8,7 +8,8 @@
     "express": "^4.17.1",
     "node-fetch": "^2.6.0",
     "node-iplocate": "^1.0.1",
-    "pg": "^7.12.1"
+    "pg": "^7.12.1",
+    "redis": "^2.8.0"
   },
   "devDependencies": {},
   "scripts": {
