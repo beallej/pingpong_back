@@ -3,8 +3,6 @@ var bodyParser  = require("body-parser");
 let fetch = require('node-fetch');
 const { Client } = require('pg');
 const iplocate = require('node-iplocate');
-var redis = require('redis');
-// var client = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
 
 
 
@@ -20,11 +18,19 @@ const client = new Client({
 client.connect();
 
 /*
-* {
-*   iplist: [{address: "213.248.70.0", hostname: "abc.def.com"} , {address: "213.248.70.2", hostname ':'sds.sds.com"}, etc... ],
-*   src: "123.45.56.7",
-*   dst: "344.234.23.3"
-* }
+* [
+*   {
+*       iplist: [{address: "213.248.70.0", hostname: "abc.def.com"} , {address: "213.248.70.2", hostname ':'sds.sds.com"}, etc... ],
+*       src: "123.45.56.7",
+*       dst: "344.234.23.3"
+*   },
+*   {
+*       iplist: [{address: "213.248.70.0", hostname: "abc.def.com"} , {address: "213.248.70.2", hostname ':'sds.sds.com"}, etc... ],
+*       src: "123.45.56.7",
+*       dst: "344.234.23.3"
+*   },
+*   etc...
+* ]
 * */
 app.post('/traceroute',async function(request, response){
     // let ipList = request.body.ipList;
@@ -35,6 +41,9 @@ app.post('/traceroute',async function(request, response){
     // })
 
     console.log("BODY: " + request.body)
+    request.body.traceroutes.map((tr) => {
+
+    })
     return response.status(200).end()
 
     // let location = await getLocation(ip);
