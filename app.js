@@ -3,7 +3,9 @@ var bodyParser  = require("body-parser");
 let fetch = require('node-fetch');
 const { Client } = require('pg');
 const iplocate = require('node-iplocate');
-
+const neo4j = require('neo4j-driver').v1;
+const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+const session = driver.session();
 
 
 const app = express();
@@ -17,21 +19,6 @@ const client = new Client({
 
 client.connect();
 
-/*
-* [
-*   {
-*       iplist: [{address: "213.248.70.0", hostname: "abc.def.com"} , {address: "213.248.70.2", hostname ':'sds.sds.com"}, etc... ],
-*       src: "123.45.56.7",
-*       dst: "344.234.23.3"
-*   },
-*   {
-*       iplist: [{address: "213.248.70.0", hostname: "abc.def.com"} , {address: "213.248.70.2", hostname ':'sds.sds.com"}, etc... ],
-*       src: "123.45.56.7",
-*       dst: "344.234.23.3"
-*   },
-*   etc...
-* ]
-* */
 app.post('/traceroute',async function(request, response){
     // let ipList = request.body.ipList;
     // let src = request.body.src.trim();
@@ -41,34 +28,12 @@ app.post('/traceroute',async function(request, response){
     // })
 
     console.log("BODY: " + request.body)
-    request.body.traceroutes.map((tr) => {
 
-    })
     return response.status(200).end()
 
-    // let location = await getLocation(ip);
-    // console.log("ip: " , ip);
-    // console.log("location: ", location);
-    // let dbRes;
-    // let status = 200;
-    // if (location.latitude && location.longitude){
-    //     if (location.country_code !== "FR") {
-    //         console.log("ip " + ip + " not in france, located in " + location.country_code)
-    //         status = 406;
-    //     } else {
-    //         dbRes = await saveToDb(ip, location.latitude, location.longitude, location.asn, location.isp);
-    //         status = 201;
-    //     }
-    //
-    // } else {
-    //     status = 404;
-    //     console.log("location info null for ip: ", ip);
-    // }
-    // response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com");
-    // response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    // return response.status(status).send(dbRes);
-
 });
+
+
 
 app.post('/ip/add',async function(request, response){
     let ip = request.body.ip;
@@ -155,3 +120,23 @@ async function getAllData() {
         return null;
     }
 }
+
+
+//
+// const personName = 'Alice';
+// const resultPromise = session.run(
+//     'CREATE (a:Person {name: $name}) RETURN a',
+//     {name: personName}
+// );
+//
+// resultPromise.then(result => {
+//     session.close();
+//
+//     const singleRecord = result.records[0];
+//     const node = singleRecord.get(0);
+//
+//     console.log(node.properties.name);
+//
+//     // on application exit:
+//     driver.close();
+// });
