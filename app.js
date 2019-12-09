@@ -3,9 +3,9 @@ var bodyParser  = require("body-parser");
 let fetch = require('node-fetch');
 const { Client } = require('pg');
 const iplocate = require('node-iplocate');
-const neo4j = require('neo4j-driver').v1;
-const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
-const session = driver.session();
+// const neo4j = require('neo4j-driver').v1;
+// const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
+// const session = driver.session();
 
 
 const app = express();
