@@ -5,7 +5,7 @@ const { Client } = require('pg');
 const iplocate = require('node-iplocate');
 // var neo4j = require('neo4j');
 // var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
-var neo4j = require('neo4j-driver').v1;
+var neo4j = require('neo4j-driver');
 
 // var db = new neo4j.GraphDatabase("http://v303:GtGq5rldxu@hobby-geefdaeefcom.dbs.graphenedb.com:24789");
 
