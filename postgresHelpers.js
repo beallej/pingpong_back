@@ -94,9 +94,10 @@ async function getTracerouteLocationInfo(src, traceroutes){
             route.concat(chemin);
             route.push(dstNode);
             console.log("route: ", route)
-            return routes;
+            return route;
         });
     });
+    return routes;
 }
 
 module.exports = {getInfoForIp: getInfoForIpFromDb, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData};
