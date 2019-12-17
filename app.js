@@ -13,14 +13,11 @@ app.use(bodyParser.json());
 
 
 app.post('/traceroute',async function(request, response){
-    // console.log("TRACEROUTE" + request.body.src, request.body.traceroutes)
-    // console.log(IP_TYPES.USER)
     let src = await getInfoForIp(request.body.src, IP_TYPES.USER);
-    // console.log("src", src)
-
     let routes = await getTracerouteLocationInfo(src, request.body.traceroutes);
     console.log("routes: ", routes);
 
+    // let createResult = await addTraceroutesToDb([]);
     let createResult = await addTraceroutesToDb(routes);
     response.statusCode = 200;
     response.statusMessage = "Traceroutes successsfully added";
