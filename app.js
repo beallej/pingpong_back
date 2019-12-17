@@ -3,22 +3,13 @@ var bodyParser  = require("body-parser");
 let fetch = require('node-fetch');
 const { Client } = require('pg');
 const iplocate = require('node-iplocate');
-var neo4j = require('neo4j');
-var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
+// var neo4j = require('neo4j');
+// var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
+var neo4j = require('neo4j-driver').v1;
 
-db.cypher({
-    query: 'CREATE (n:Person {name: {personName}}) RETURN n',
-    params: {
-        personName: 'Bob'
-    }
-}, function(err, results){
-    var result = results[0];
-    if (err) {
-        console.error('Error saving new node to database:', err);
-    } else {
-        console.log('Node saved to database with id:', result['n']['_id']);
-    }
-});
+var driver = neo4j.driver(process.env['GRAPHENEDB_URL']);
+// var db = new neo4j.GraphDatabase("http://v303:GtGq5rldxu@hobby-geefdaeefcom.dbs.graphenedb.com:24789");
+
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -29,22 +20,47 @@ const client = new Client({
 });
 
 client.connect();
+/*
+*
+*traceroutes.append({"dst": address, "route": chemin})
 
+
+print({"traceroutes": traceroutes, "src": ip})
+* */
 app.post('/traceroute',async function(request, response){
-    // let ipList = request.body.ipList;
-    // let src = request.body.src.trim();
-    // let dst = request.body.dst.trim();
-    // ipList.map((ip) => {
-    //     let location = getLocation(ip.trim());
-    // })
 
-    console.log("BODY: " + request.body)
+    let src = await getInfoForIp(request.body.src, 'user');
+    console.log("src:", src);
+    let routes = request.body.traceroutes.map(async (tr) => {
+          let route = [src];
+          let dstNode = await getInfoForIp(tr.dst, 'user');
+          console.log("dst: ", dstNode)
+          let tracerouteProm = tr.route.map((hop) => {return getInfoForIp(hop, 'intermediate')});
+          let chemin = Promise.all(tracerouteProm);
+          route.concat(chemin);
+          route.push(dstNode);
+          console.log("route: ", route)
+    });
+    console.log("routes: ", routes);
+    let session = driver.session();
+    let createQueryString = routes.map((route) => {
+       let createString = "MERGE path ="
+       createString += route.slice(0,-1).map((hop, index) => {
+           return "(n" + index + ":IP " + hop + ")-[:PINGS]->"
+       }).join("");
+        let dst = route[-1];
+        createString += "(n" + route.length -1 + ":IP " + dst + ")"
+        createString += " RETURN path";
+        console.log(createString);
+    }).join(", ");
+
+    let createResult = await session.run(createQueryString);
+    session.close();
+    console.log(createResult);
 
     return response.status(200).end()
 
 });
-
-
 
 app.post('/ip/add',async function(request, response){
     let ip = request.body.ip;
@@ -102,22 +118,37 @@ async function getLocation(ip) {
     return null
 }
 const insertText = 'INSERT INTO IP_INFO(ADDRESS, LATITUDE, LONGITUDE, ASN, ISP) VALUES($1, $2, $3, $4, $5) RETURNING *';
-const existsText = 'SELECT * FROM IP_INFO WHERE ADDRESS = $1';
+
 async function saveToDb(ip, latitude, longitude, asn, isp) {
     const values = [ip, latitude, longitude, asn, isp]
     try {
-        let res = await client.query(existsText, [ip])
-        if (res.rows.length > 0) {
+        let existingEntry = await getInfoForIp(ip)
+        if (existingEntry) {
             console.log("ip already in db" + ip)
             return null;
         }
-        res = await client.query(insertText, values)
+        let res = await client.query(insertText, values)
         console.log(res.rows[0])
         return res.rows[0];
     } catch (err) {
         console.log("error saving to db", err.stack)
         return null;
     }
+}
+
+const existsText = 'SELECT * FROM IP_INFO WHERE ADDRESS = $1';
+
+async function getInfoForIp(ip, type=null){
+    let res = await client.query(existsText, [ip])
+    if (res.rows.length > 0) {
+        let ipInfo = res.rows[0]
+        if (type){
+            return {type, ...ipInfo}
+        } else {
+            return ipInfo
+        }
+    }
+    return null;
 }
 
 async function getAllData() {
