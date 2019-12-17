@@ -15,4 +15,4 @@ async function getLocation(ip) {
     return null
 }
 
-module.exports = {getLocation}
+export {getLocation};

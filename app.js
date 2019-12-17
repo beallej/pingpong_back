@@ -1,6 +1,6 @@
 const {IP_TYPES} = require("./constants.js");
-import {addTraceroutesToDb} from "./neo4jhelpers.js";
-import {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData} from "./postgresHelpers";
+const {addTraceroutesToDb} = require("./neo4jhelpers.js");
+const {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData} = require("./postgresHelpers");
 const express = require('express')
 var bodyParser  = require("body-parser");
 let fetch = require('node-fetch');

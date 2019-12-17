@@ -1,5 +1,5 @@
-import {IP_TYPES, QUERY_STRINGS} from "./constants";
-import {getLocation} from "./ipLocateHelpers";
+const {IP_TYPES, QUERY_STRINGS} = require("./constants");
+const {getLocation} = require("./ipLocateHelpers");
 const { Client } = require('pg');
 
 const client = new Client({
@@ -89,4 +89,4 @@ async function getTracerouteLocationInfo(src, traceroutes){
     return routes;
 }
 
-module.exports = {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData};
+export {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData};
