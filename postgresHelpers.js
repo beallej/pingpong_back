@@ -11,7 +11,7 @@ client.connect();
 async function saveToDb(ip, latitude, longitude, asn, isp, type) {
     const values = [ip, latitude, longitude, asn, isp]
     try {
-        let existingEntry = await getInfoForIp(ip, type)
+        let existingEntry = await getInfoForIpFromDb(ip, type)
         if (existingEntry) {
             console.log("ip already in db" + ip)
             return null;
@@ -26,17 +26,13 @@ async function saveToDb(ip, latitude, longitude, asn, isp, type) {
 }
 
 
-async function getInfoForIp(ip, type){
+async function getInfoForIpFromDb(ip, type){
     console.log(QUERY_STRINGS[type].GET_ONE, ip)
     let res = await client.query(QUERY_STRINGS[type].GET_ONE, [ip])
     console.log("rows",res.rows.length)
     if (res.rows.length > 0) {
         let ipInfo = res.rows[0]
-        if (type){
-            return {type, ...ipInfo}
-        } else {
-            return ipInfo
-        }
+        return {type, ...ipInfo}
     }
     return null;
 }
@@ -76,13 +72,24 @@ async function insertIpWithLocation(ip, type) {
     }
     return response;
 }
-
+async function getInfoForIp(ip, type){
+    let ipInfo;
+    const dbRes = await getInfoForIpFromDb(ip, type);
+    if (!dbRes) {
+        ipInfo = await getLocation(ip);
+        ip.address = ip;
+    } else {
+        ipInfo = dbRes;
+    }
+    return ipInfo;
+}
 async function getTracerouteLocationInfo(src, traceroutes){
     let routes = traceroutes.map(async (tr) => {
         let route = [src];
-        let dstNode = await getInfoForIp(tr.dst, IP_TYPES.USER);
-        console.log("dst: ", dstNode)
-        let tracerouteProm = tr.route.map((hop) => {return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)});
+        let dstNode = await getInfoForIpFromDb(tr.dst, IP_TYPES.USER);  //REPLACE WITH GETINFOFRORIP
+        let tracerouteProm = tr.route.map((hop) => {
+            return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)});
+
         Promise.all(tracerouteProm).then((chemin) => {
             route.concat(chemin);
             route.push(dstNode);
@@ -92,4 +99,4 @@ async function getTracerouteLocationInfo(src, traceroutes){
     });
 }
 
-module.exports = {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData};
+module.exports = {getInfoForIp: getInfoForIpFromDb, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData};
