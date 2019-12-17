@@ -81,6 +81,7 @@ async function getInfoForIp(ip, type){
     } else {
         ipInfo = dbRes;
     }
+    console.log("IPINFO:", ipInfo)
     return ipInfo;
 }
 async function getTraceroutesLocationInfo(src, traceroutes){
