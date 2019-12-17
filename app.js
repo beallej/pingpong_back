@@ -37,7 +37,7 @@ app.post('/ip/add',async function(request, response){
     let ip = request.body.ip;
     ip =  ip.trim()  //remove extra newline char
 
-    let responseInfo = await insertIpWithLocation(ip)
+    let responseInfo = await insertIpWithLocation(ip, IP_TYPES.USER)
     response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     response.statusCode = responseInfo.statusCode;
