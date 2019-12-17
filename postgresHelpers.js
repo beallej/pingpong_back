@@ -114,7 +114,7 @@ async function getOneTracerouteLocationInfo(src, tr){
     let dstNode = await getInfoForIpFromDb(tr.dst, IP_TYPES.USER);  //REPLACE WITH GETINFOFRORIP
 
     async function getIntermediateTracerouteLocationInfo(tr){
-        return Promise.all(tr.map((hop) => {
+        return Promise.all(tr.route.map((hop) => {
             return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)
         }));
     }
