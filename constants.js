@@ -1,7 +1,7 @@
 
-const constants = () => {
-    const IP_TYPES = Object.freeze({'USER': 'USER', 'INTERMEDIATE': "INTERMEDIATE"})
-    const QUERY_STRINGS = Object.freeze({
+
+export const IP_TYPES = Object.freeze({'USER': 'USER', 'INTERMEDIATE': "INTERMEDIATE"})
+export const QUERY_STRINGS = Object.freeze({
         'USER': {
             'CREATE': 'INSERT INTO IP_INFO(ADDRESS, LATITUDE, LONGITUDE, ASN, ISP) VALUES($1, $2, $3, $4, $5) RETURNING *',
             'EXISTS': 'INSERT INTO INTERMEDIATE_IP_INFO(ADDRESS, LATITUDE, LONGITUDE, ASN, ISP) VALUES($1, $2, $3, $4, $5) RETURNING *',
@@ -13,4 +13,4 @@ const constants = () => {
             'GET_ALL': 'SELECT * FROM INTERMEDIATE_IP_INFO',
         }
     });
-};
+
