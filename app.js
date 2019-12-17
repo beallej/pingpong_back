@@ -7,8 +7,14 @@ const iplocate = require('node-iplocate');
 // var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
 var neo4j = require('neo4j-driver').v1;
 
-var driver = neo4j.driver(process.env['GRAPHENEDB_URL']);
 // var db = new neo4j.GraphDatabase("http://v303:GtGq5rldxu@hobby-geefdaeefcom.dbs.graphenedb.com:24789");
+
+
+const graphenedbURL = process.env.GRAPHENEDB_BOLT_URL;
+const graphenedbUser = process.env.GRAPHENEDB_BOLT_USER;
+const graphenedbPass = process.env.GRAPHENEDB_BOLT_PASSWORD;
+
+const driver = neo4j.driver(graphenedbURL, neo4j.auth.basic(graphenedbUser, graphenedbPass));
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
