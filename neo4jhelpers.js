@@ -23,4 +23,4 @@ async function addTraceroutesToDb(routes){
     return createResult
 }
 
-export {addTraceroutesToDb};
+module.exports = {addTraceroutesToDb};
