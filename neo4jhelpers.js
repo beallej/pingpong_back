@@ -10,10 +10,10 @@ async function addTraceroutesToDb(routes){
     let createQueryString = routes.map((route) => {
         let createString = "MERGE path ="
         createString += route.slice(0,-1).map((hop, index) => {
-            return "(n" + index + ":IP " + hop + ")-[:PINGS]->"
+            return "(n" + index + ":IP " + JSON.stringify(hop) + ")-[:PINGS]->"
         }).join("");
         let dst = route[-1];
-        createString += "(n" + route.length -1 + ":IP " + dst + ")"
+        createString += "(n" + route.length -1 + ":IP " + JSON.stringify(dst) + ")"
         createString += " RETURN path";
         console.log(createString);
     }).join(", ");

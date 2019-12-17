@@ -89,25 +89,9 @@ async function getTraceroutesLocationInfo(src, traceroutes){
     let routes = Promise.all(traceroutes.map((tr) => {
         return getOneTracerouteLocationInfo(src, tr);
     }));
-    console.log("routes after p.a", routes)
     return routes;
-
-
-    // let routes = await traceroutes.map(async (tr) => {
-    //     let route = [src];
-    //     let dstNode = await getInfoForIpFromDb(tr.dst, IP_TYPES.USER);  //REPLACE WITH GETINFOFRORIP
-    //     let tracerouteProm = tr.route.map((hop) => {
-    //         return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)});
-    //
-    //     Promise.all(tracerouteProm).then((chemin) => {
-    //         route.concat(chemin);
-    //         route.push(dstNode);
-    //         console.log("route: ", route)
-    //         return route;
-    //     });
-    // });
-    // return routes;
 }
+
 async function getOneTracerouteLocationInfo(src, tr){
 
     let route = [src];
@@ -121,7 +105,10 @@ async function getOneTracerouteLocationInfo(src, tr){
 
     let intermediateIpInfo = await getIntermediateTracerouteLocationInfo(tr);
 
-    console.log(intermediateIpInfo);
+    let validIntermediateIpInfo = intermediateIpInfo.filter((ipInfo) => {
+        return (ipInfo.latitude !== null && ipInfo.longitude !== null)
+    })
+    console.log(intermediateIpInfo.length, validIntermediateIpInfo.length)
     route.push(intermediateIpInfo)
     route.push(dstNode);
     console.log("route inside get1: ", route)
