@@ -83,12 +83,13 @@ async function getTracerouteLocationInfo(src, traceroutes){
         let dstNode = await getInfoForIp(tr.dst, IP_TYPES.USER);
         console.log("dst: ", dstNode)
         let tracerouteProm = tr.route.map((hop) => {return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)});
-        let chemin = Promise.all(tracerouteProm);
-        route.concat(chemin);
-        route.push(dstNode);
-        console.log("route: ", route)
+        Promise.all(tracerouteProm).then((chemin) => {
+            route.concat(chemin);
+            route.push(dstNode);
+            console.log("route: ", route)
+            return routes;
+        });
     });
-    return routes;
 }
 
 module.exports = {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData};
