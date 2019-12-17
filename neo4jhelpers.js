@@ -16,6 +16,7 @@ async function addTraceroutesToDb(routes){
         createString += "(n" + route.length -1 + ":IP " + JSON.stringify(dst) + ")"
         createString += " RETURN path";
         console.log(createString);
+        return createString;
     }).join(", ");
 
     let createResult = await session.run(createQueryString);
