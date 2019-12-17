@@ -83,21 +83,74 @@ async function getInfoForIp(ip, type){
     }
     return ipInfo;
 }
-async function getTracerouteLocationInfo(src, traceroutes){
-    let routes = traceroutes.map(async (tr) => {
-        let route = [src];
-        let dstNode = await getInfoForIpFromDb(tr.dst, IP_TYPES.USER);  //REPLACE WITH GETINFOFRORIP
-        let tracerouteProm = tr.route.map((hop) => {
-            return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)});
+async function getTraceroutesLocationInfo(src, traceroutes){
 
-        Promise.all(tracerouteProm).then((chemin) => {
-            route.concat(chemin);
-            route.push(dstNode);
-            console.log("route: ", route)
-            return route;
-        });
-    });
+    let routes = Promise.all(traceroutes.map((tr) => {
+        return getOneTracerouteLocationInfo(src, tr);
+    }));
+    console.log("routes after p.a", routes)
     return routes;
+
+
+    // let routes = await traceroutes.map(async (tr) => {
+    //     let route = [src];
+    //     let dstNode = await getInfoForIpFromDb(tr.dst, IP_TYPES.USER);  //REPLACE WITH GETINFOFRORIP
+    //     let tracerouteProm = tr.route.map((hop) => {
+    //         return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)});
+    //
+    //     Promise.all(tracerouteProm).then((chemin) => {
+    //         route.concat(chemin);
+    //         route.push(dstNode);
+    //         console.log("route: ", route)
+    //         return route;
+    //     });
+    // });
+    // return routes;
+}
+async function getOneTracerouteLocationInfo(src, tr){
+
+    let route = [src];
+    let dstNode = await getInfoForIpFromDb(tr.dst, IP_TYPES.USER);  //REPLACE WITH GETINFOFRORIP
+
+    route.concat(Promise.all(tr.map((hop) => {
+        return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)
+    })));
+    route.push(dstNode);
+    console.log("route inside get1: ", route)
+    return route;
+    // let tracerouteProm = tr.route.map((hop) => {
+    //     return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)});
+    //
+    // Promise.all(tracerouteProm).then((chemin) => {
+    //     route.concat(chemin);
+    //     route.push(dstNode);
+    //     console.log("route: ", route)
+    //     return route;
+    // });
+    // return null;
 }
 
-module.exports = {getInfoForIp: getInfoForIpFromDb, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData};
+/*
+* const tr = [1, 2, 3, 4, 5] //...an array filled with values
+
+const functionWithPromise = item => { //a function that returns a promise
+  return Promise.resolve('ok')
+}
+
+const getInfoForIp = async item => {
+  return functionWithPromise(item)
+}
+
+const getTracerouteLocationInfo = async () => {
+  return Promise.all(tr.map(item => getInfoForIp(item)))
+}
+
+
+
+
+
+getTraceroutesLocationInfo().then(data => {
+  console.log(data)
+})
+* */
+module.exports = {getInfoForIp: getInfoForIpFromDb, getTracerouteLocationInfo: getTraceroutesLocationInfo, insertIpWithLocation, getAllUserIpData};
