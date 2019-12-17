@@ -27,7 +27,9 @@ async function saveToDb(ip, latitude, longitude, asn, isp, type) {
 
 
 async function getInfoForIp(ip, type){
-    let res = await client.query(QUERY_STRINGS[type].GET_ALL, [ip])
+    console.log(QUERY_STRINGS[type].GET_ONE)
+    let res = await client.query(QUERY_STRINGS[type].GET_ONE, [ip])
+    console.log(res)
     if (res.rows.length > 0) {
         let ipInfo = res.rows[0]
         if (type){
