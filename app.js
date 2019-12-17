@@ -1,4 +1,4 @@
-import {IP_TYPES} from "./constants.js";
+const {IP_TYPES} = require("./constants.js");
 import {addTraceroutesToDb} from "./neo4jhelpers.js";
 import {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData} from "./postgresHelpers";
 const express = require('express')

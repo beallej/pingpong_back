@@ -12,4 +12,4 @@ const QUERY_STRINGS = Object.freeze({
     }
 });
 
-module.exports = {IP_TYPES, QUERY_STRINGS};
+export {IP_TYPES, QUERY_STRINGS};
