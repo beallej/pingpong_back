@@ -109,7 +109,7 @@ async function getOneTracerouteLocationInfo(src, tr){
         return (ipInfo.latitude !== null && ipInfo.longitude !== null)
     })
     console.log(intermediateIpInfo.length, validIntermediateIpInfo.length)
-    route.push(intermediateIpInfo)
+    route.concat(intermediateIpInfo)
     route.push(dstNode);
     console.log("route inside get1: ", route)
     return route;
