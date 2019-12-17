@@ -11,7 +11,7 @@ client.connect();
 async function saveToDb(ip, latitude, longitude, asn, isp, type) {
     const values = [ip, latitude, longitude, asn, isp]
     try {
-        let existingEntry = await getInfoForIp(ip)
+        let existingEntry = await getInfoForIp(ip, type)
         if (existingEntry) {
             console.log("ip already in db" + ip)
             return null;
