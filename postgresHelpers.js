@@ -89,4 +89,4 @@ async function getTracerouteLocationInfo(src, traceroutes){
     return routes;
 }
 
-export {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData};
+module.exports = {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData};

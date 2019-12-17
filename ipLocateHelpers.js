@@ -22,4 +22,4 @@ async function getLocation(ip) {
 }
 
 
-module.exports = {getLocation}
+module.exports = {getLocation};
