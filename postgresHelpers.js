@@ -112,9 +112,11 @@ async function getOneTracerouteLocationInfo(src, tr){
     let route = [src];
     let dstNode = await getInfoForIpFromDb(tr.dst, IP_TYPES.USER);  //REPLACE WITH GETINFOFRORIP
 
-    route.concat(Promise.all(tr.map((hop) => {
+    let intermediateIpInfo = await Promise.all(tr.map((hop) => {
         return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)
-    })));
+    }));
+    console.log(intermediateIpInfo);
+    route.push(intermediateIpInfo)
     route.push(dstNode);
     console.log("route inside get1: ", route)
     return route;
