@@ -13,7 +13,7 @@ var neo4j = require('neo4j-driver').v1;
 const graphenedbURL = process.env.GRAPHENEDB_BOLT_URL;
 const graphenedbUser = process.env.GRAPHENEDB_BOLT_USER;
 const graphenedbPass = process.env.GRAPHENEDB_BOLT_PASSWORD;
-
+console.log(graphenedbURL, graphenedbUser, graphenedbPass, neo4j)
 const driver = neo4j.driver(graphenedbURL, neo4j.auth.basic(graphenedbUser, graphenedbPass));
 
 const app = express();
