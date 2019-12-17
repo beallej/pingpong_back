@@ -32,7 +32,7 @@ async function getInfoForIpFromDb(ip, type){
     console.log("rows",res.rows.length)
     if (res.rows.length > 0) {
         let ipInfo = res.rows[0]
-        return {type, ...ipInfo}
+        return ipInfo
     }
     return null;
 }
@@ -77,7 +77,7 @@ async function getInfoForIp(ip, type){
     const dbRes = await getInfoForIpFromDb(ip, type);
     if (!dbRes) {
         ipInfo = await getLocation(ip);
-        ip.address = ip;
+        ipInfo.address = ip;
     } else {
         ipInfo = dbRes;
     }
