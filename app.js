@@ -17,9 +17,8 @@ app.post('/traceroute',async function(request, response){
     let routes = await getTracerouteLocationInfo(src, request.body.traceroutes);
     console.log("routes: ", routes);
 
-    // let createResult = await addTraceroutesToDb([]);
     let createResult = await addTraceroutesToDb(routes);
- 
+
 
     console.log(createResult);
     response.header("Access-Control-Allow-Origin", "*");
