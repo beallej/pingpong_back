@@ -81,7 +81,6 @@ async function getInfoForIp(ip, type){
     } else {
         ipInfo = dbRes;
     }
-    console.log("IPINFO:", ipInfo)
     return ipInfo;
 }
 async function addTraceroutesToIpList(routes){
@@ -91,11 +90,10 @@ async function addTraceroutesToIpList(routes){
 }
 async function addOneTracerouteToIpList(route){
     let intermediateIPsFiltered = {};
-    let intermediateIPs = route.slice(1, -1);
-    intermediateIPs.forEach((ip) => intermediateIPsFiltered[ip.address] = ip);
+    // let intermediateIPs = route.slice(1, -1);
+    route.intermediate.forEach((ip) => intermediateIPsFiltered[ip.address] = ip);
     intermediateIPsFiltered = Object.values(intermediateIPsFiltered)
 
-    console.log("INTERMED", intermediateIPsFiltered)
     return Promise.all(intermediateIPsFiltered.map((ip) => {
         return saveToDb(ip.address, ip.latitude, ip.longitude, ip.asn, ip.isp, IP_TYPES.INTERMEDIATE)
     }))
@@ -110,9 +108,9 @@ async function getTraceroutesLocationInfo(src, traceroutes){
 
 async function getOneTracerouteLocationInfo(src, tr){
 
-    let route = [src];
+    let route = {src};
     let dstNode = await getInfoForIpFromDb(tr.dst, IP_TYPES.USER);  //REPLACE WITH GETINFOFRORIP
-
+    route.dst = dstNode
     async function getIntermediateTracerouteLocationInfo(tr){
         return Promise.all(tr.route.map((hop) => {
             return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)
@@ -125,8 +123,9 @@ async function getOneTracerouteLocationInfo(src, tr){
         return (ipInfo.latitude !== null && ipInfo.longitude !== null)
     })
     console.log(intermediateIpInfo.length, validIntermediateIpInfo.length)
-    route = route.concat(intermediateIpInfo)
-    route.push(dstNode);
+    // route = route.concat(intermediateIpInfo)
+    route.intermediate = intermediateIpInfo
+    // route.push(dstNode);
     return route;
 }
 

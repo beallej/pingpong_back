@@ -3,7 +3,10 @@ var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
 async function addTraceroutesToDb(routes){
     let nodeQueries = []
     routes.map((route) => {
-        route.map((hop) => {
+        let routeList = [route.src];
+        routeList = route.concat(route.intermediate);
+        routeList.push(route.dst);
+        routeList.map((hop) => {
             let query = "MERGE (:IP {address: {ipAddress}";
             query += hop.latitude ? ", latitude: {ipLatitude}" : "";
             query += hop.longitude ? ", longitude: {ipLongitude}" : "";
@@ -38,8 +41,9 @@ async function addTraceroutesToDb(routes){
     function addPingRelationships() {
         let relQueries = [];
         routes.map((route) => {
-            let src = route[0].address;
-            let dst = route[route.length -1].address;
+            let routeList = [route.src];
+            routeList = route.concat(route.intermediate);
+            routeList.push(route.dst);
             route.map((hop, ind) => {
                 if (ind < route.length - 1) {
                     relQueries.push({
@@ -49,8 +53,8 @@ async function addTraceroutesToDb(routes){
                         params: {
                             node1Address: hop.address,
                             node2Address: route[ind + 1].address,
-                            srcIp: src,
-                            dstIp: dst
+                            srcIp: route.src.address,
+                            dstIp: route.dst.address
                         },
                         lean: true
                     })
