@@ -29,6 +29,15 @@ async function addTraceroutesToDb(routes){
     console.log(createQueryString)
     // let createQueryString = " MERGE path =(n0:IP {\"address\":\"93.23.197.11\",\"latitude\":\"43.6046\",\"longitude\":\"1.4451\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"})-[:PINGS]->(n1:IP [{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8543,\"longitude\":2.3527,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"}])-[:PINGS]->NaN:IP {\"type\":\"USER\",\"address\":\"77.136.40.239\",\"latitude\":\"48.8543\",\"longitude\":\"2.3527\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"}) RETURN path"
     try {
+
+        driver.verifyConnectivity().then((value)=> {
+            console.log("verify connectivity")
+            console.log(value.address, value.version)
+            console.log(value)
+        }).catch((problem) => {
+            console.log("verify connectivity NO")
+            console.log(problem)
+        })
         let createResult = await session.run(createQueryString);
         session.close();
         return createResult
