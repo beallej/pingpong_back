@@ -1,13 +1,3 @@
-// const neo4j = require('neo4j-driver');
-// //
-// const graphenedbURL = process.env.GRAPHENEDB_BOLT_URL;
-// const graphenedbUser = process.env.GRAPHENEDB_BOLT_USER;
-// const graphenedbPass = process.env.GRAPHENEDB_BOLT_PASSWORD;
-// const driver = neo4j.driver(graphenedbURL, neo4j.auth.basic(graphenedbUser, graphenedbPass));
-
-
-// const driver = neo4j.driver(process.env['GRAPHENEDB_URL']);
-
 var neo4j = require('neo4j');
 var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
 async function addTraceroutesToDb(routes){
@@ -17,7 +7,7 @@ async function addTraceroutesToDb(routes){
         let dst = route[route.length -1].address;
         route.map((hop) => {
             queries.push({
-                query: "CREATE (ip:IP {address: {ipAddress}, latitude: {ipLatitude}, longitude: {ipLongitude}, asn: {ipAsn}, isp: {ipIsp}}) RETURN ip",
+                query: "MERGE (ip:IP {address: {ipAddress}, latitude: {ipLatitude}, longitude: {ipLongitude}, asn: {ipAsn}, isp: {ipIsp}}) RETURN ip",
                 params: {
                     ipAddress: hop.address,
                     ipLatitude: hop.latitude,
@@ -33,7 +23,7 @@ async function addTraceroutesToDb(routes){
                 queries.push({
                     query: "MATCH (node1: IP), (node2: IP) " +
                         "WHERE node1.address = {node1Address} AND node2.address = {node2Address} " +
-                        "CREATE (node1)-[r:PINGS {src: {srcIp}, dst: {dstIp}}]->(node2) RETURN r",
+                        "MERGE (node1)-[r:PINGS {src: {srcIp}, dst: {dstIp}}]->(node2) RETURN r",
                     params: {
                         node1Address: hop.address,
                         node2Address: route[ind + 1].address,
