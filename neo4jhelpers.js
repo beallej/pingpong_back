@@ -4,7 +4,7 @@ async function addTraceroutesToDb(routes){
     let nodeQueries = []
     routes.map((route) => {
         let routeList = [route.src];
-        routeList = route.concat(route.intermediate);
+        routeList = routeList.concat(route.intermediate);
         routeList.push(route.dst);
         routeList.map((hop) => {
             let query = "MERGE (:IP {address: {ipAddress}";
@@ -42,7 +42,7 @@ async function addTraceroutesToDb(routes){
         let relQueries = [];
         routes.map((route) => {
             let routeList = [route.src];
-            routeList = route.concat(route.intermediate);
+            routeList = routeList.concat(route.intermediate);
             routeList.push(route.dst);
             route.map((hop, ind) => {
                 if (ind < route.length - 1) {
