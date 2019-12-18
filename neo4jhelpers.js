@@ -541,16 +541,26 @@ MATCH (a)-[:ACTED_IN]->(m)<-[:DIRECTED]-(d) RETURN a,m,d LIMIT 10
     let createQueryString = "MERGE path =(n0:IP {\"address\":\"93.23.197.11\",\"latitude\":\"43.6046\",\"longitude\":\"1.4451\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"})-[:PINGS]->-[:PINGS]->(n6:IP {\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\",\"address\":\"77.136.134.1\"})-[:PINGS]->(n7:IP {\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\",\"address\":\"77.136.10.34\"})-[:PINGS]->(n8:IP {\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\",\"address\":\"109.24.74.182\"})-[:PINGS]->(n9:IP {\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\",\"address\":\"77.136.10.153\"})-[:PINGS]->(n10:IP {\"latitude\":48.8543,\"longitude\":2.3527,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\",\"address\":\"77.154.230.106\"})-[:PINGS]->(n11:IP {\"address\":\"77.136.40.239\",\"latitude\":\"48.8543\",\"longitude\":\"2.3527\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"}) RETURN path\n"
     console.log(createQueryString)
     // let createQueryString = " MERGE path =(n0:IP {\"address\":\"93.23.197.11\",\"latitude\":\"43.6046\",\"longitude\":\"1.4451\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"})-[:PINGS]->(n1:IP [{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8543,\"longitude\":2.3527,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"}])-[:PINGS]->NaN:IP {\"type\":\"USER\",\"address\":\"77.136.40.239\",\"latitude\":\"48.8543\",\"longitude\":\"2.3527\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"}) RETURN path"
+    // db.cypher({
+    //     query: createQueryString,
+    //     params: {},
+    // }, (res) => {
+    //     console.log("GOT RES", res)
+    // });
 
-    db.verifyConnectivity().then((v) => {console.log("YES", v.version, v.address)}).catch((f)=> {console.log("NO", f)})
     db.cypher({
-        query: createQueryString,
-        params: {},
-    }, (res) => {
-        console.log("GOT RES", res)
+        query: 'CREATE (n:Person {name: {personName}}) RETURN n',
+        params: {
+            personName: 'Bob'
+        }
+    }, function(err, results){
+        var result = results[0];
+        if (err) {
+            console.error('Error saving new node to database:', err);
+        } else {
+            console.log('Node saved to database with id:', result['n']['_id']);
+        }
     });
-
-
 
     // try {
     //
