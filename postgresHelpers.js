@@ -93,7 +93,7 @@ async function addOneTracerouteToIpList(route){
     let intermediateIPsFiltered = {};
     let intermediateIPs = route.slice(1, -1);
     intermediateIPs.forEach((ip) => intermediateIPsFiltered[ip.address] = ip);
-    intermediateIPsFiltered = intermediateIPsFiltered.values()
+    intermediateIPsFiltered = Object.values(intermediateIPsFiltered)
 
     console.log("INTERMED", intermediateIPsFiltered)
     return Promise.all(intermediateIPsFiltered.map((ip) => {
