@@ -561,6 +561,7 @@ MATCH (a)-[:ACTED_IN]->(m)<-[:DIRECTED]-(d) RETURN a,m,d LIMIT 10
             console.log('Node saved to database with id:', result['n']['_id']);
         }
     });
+    
 
     // try {
     //
