@@ -90,9 +90,13 @@ async function addTraceroutesToIpList(routes){
     }));
 }
 async function addOneTracerouteToIpList(route){
+    let intermediateIPsFiltered = {};
     let intermediateIPs = route.slice(1, -1);
-    console.log("INTERMED", intermediateIPs)
-    return Promise.all(intermediateIPs.map((ip) => {
+    intermediateIPs.forEach((ip) => intermediateIPsFiltered[ip.address] = ip);
+    intermediateIPsFiltered = intermediateIPsFiltered.values()
+
+    console.log("INTERMED", intermediateIPsFiltered)
+    return Promise.all(intermediateIPsFiltered.map((ip) => {
         return saveToDb(ip.address, ip.latitude, ip.longitude, ip.asn, ip.isp, IP_TYPES.INTERMEDIATE)
     }))
 }
