@@ -1,13 +1,13 @@
-// const neo4j = require('neo4j-driver');
+const neo4j = require('neo4j-driver');
 //
-// const graphenedbURL = process.env.GRAPHENEDB_BOLT_URL;
-// const graphenedbUser = process.env.GRAPHENEDB_BOLT_USER;
-// const graphenedbPass = process.env.GRAPHENEDB_BOLT_PASSWORD;
-// const driver = neo4j.driver(process.env['GRAPHENEDB_URL']);
+const graphenedbURL = process.env.GRAPHENEDB_BOLT_URL;
+const graphenedbUser = process.env.GRAPHENEDB_BOLT_USER;
+const graphenedbPass = process.env.GRAPHENEDB_BOLT_PASSWORD;
+const driver = neo4j.driver(process.env['GRAPHENEDB_URL']);
 
 
-var neo4j = require('neo4j');
-var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
+// var neo4j = require('neo4j');
+// var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
 
 async function addTraceroutesToDb(routes){
     const driver = neo4j.driver(graphenedbURL, neo4j.auth.basic(graphenedbUser, graphenedbPass));
@@ -30,34 +30,33 @@ async function addTraceroutesToDb(routes){
     console.log(createQueryString)
     // let createQueryString = " MERGE path =(n0:IP {\"address\":\"93.23.197.11\",\"latitude\":\"43.6046\",\"longitude\":\"1.4451\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"})-[:PINGS]->(n1:IP [{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":null,\"longitude\":null,\"country_code\":null,\"asn\":null,\"isp\":null},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8582,\"longitude\":2.3387,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"},{\"latitude\":48.8543,\"longitude\":2.3527,\"country_code\":\"FR\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"}])-[:PINGS]->NaN:IP {\"type\":\"USER\",\"address\":\"77.136.40.239\",\"latitude\":\"48.8543\",\"longitude\":\"2.3527\",\"asn\":\"AS15557\",\"isp\":\"SFR SA\"}) RETURN path"
 
+    //
+    // db.cypher({
+    //     query: createQueryString,
+    //     params: {},
+    // }, (res) => {
+    //     console.log("GOT RES", res)
+    // });
 
-    db.cypher({
-        query: createQueryString,
-        params: {},
-    }, (res) => {
-        console.log("GOT RES", res)
-    });
 
-    //
-    //
-    // try {
-    //
-    //     driver.verifyConnectivity().then((value)=> {
-    //         console.log("verify connectivity")
-    //         console.log(value.address, value.version)
-    //         console.log(value)
-    //     }).catch((problem) => {
-    //         console.log("verify connectivity NO")
-    //         console.log(problem)
-    //     })
-    //     let createResult = await session.run(createQueryString);
-    //     session.close();
-    //     driver.close();
-    //     return createResult
-    // }
-    // catch (e) {
-    //     console.log("probem", e)
-    // }
+
+    try {
+
+        driver.verifyConnectivity().then((value)=> {
+            console.log("verify connectivity")
+            console.log(value.address, value.version)
+            console.log(value)
+        }).catch((problem) => {
+            console.log("verify connectivity NO")
+            console.log(problem)
+        })
+        let createResult = await session.run(createQueryString);
+        session.close();
+        return createResult
+    }
+    catch (e) {
+        console.log("probem", e)
+    }
 
     //
     // db.cypher({
