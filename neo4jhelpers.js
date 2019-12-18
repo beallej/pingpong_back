@@ -3,7 +3,12 @@ const neo4j = require('neo4j-driver');
 const graphenedbURL = process.env.GRAPHENEDB_BOLT_URL;
 const graphenedbUser = process.env.GRAPHENEDB_BOLT_USER;
 const graphenedbPass = process.env.GRAPHENEDB_BOLT_PASSWORD;
-const driver = neo4j.driver(graphenedbURL, neo4j.auth.basic(graphenedbUser, graphenedbPass));
+// const driver = neo4j.driver(graphenedbURL, neo4j.auth.basic(graphenedbUser, graphenedbPass));
+const driver = neo4j.driver(process.env['GRAPHENEDB_URL']);
+
+
+// var neo4j = require('neo4j');
+// var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
 
 async function addTraceroutesToDb(routes){
     let session = driver.session();
@@ -31,6 +36,21 @@ async function addTraceroutesToDb(routes){
     catch (e) {
         console.log("probem", e)
     }
+
+    //
+    // db.cypher({
+    //     query: 'CREATE (n:Person {name: {personName}}) RETURN n',
+    //     params: {
+    //         personName: 'Bob'
+    //     }
+    // }, function(err, results){
+    //     var result = results[0];
+    //     if (err) {
+    //         console.error('Error saving new node to database:', err);
+    //     } else {
+    //         console.log('Node saved to database with id:', result['n']['_id']);
+    //     }
+    // });
 
 }
 
