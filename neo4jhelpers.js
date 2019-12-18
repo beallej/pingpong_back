@@ -1,9 +1,9 @@
-const neo4j = require('neo4j-driver');
-//
-const graphenedbURL = process.env.GRAPHENEDB_BOLT_URL;
-const graphenedbUser = process.env.GRAPHENEDB_BOLT_USER;
-const graphenedbPass = process.env.GRAPHENEDB_BOLT_PASSWORD;
-const driver = neo4j.driver(graphenedbURL, neo4j.auth.basic(graphenedbUser, graphenedbPass));
+// const neo4j = require('neo4j-driver');
+// //
+// const graphenedbURL = process.env.GRAPHENEDB_BOLT_URL;
+// const graphenedbUser = process.env.GRAPHENEDB_BOLT_USER;
+// const graphenedbPass = process.env.GRAPHENEDB_BOLT_PASSWORD;
+// const driver = neo4j.driver(graphenedbURL, neo4j.auth.basic(graphenedbUser, graphenedbPass));
 
 
 // const driver = neo4j.driver(process.env['GRAPHENEDB_URL']);
