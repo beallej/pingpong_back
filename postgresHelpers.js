@@ -84,7 +84,7 @@ async function getInfoForIp(ip, type){
     console.log("IPINFO:", ipInfo)
     return ipInfo;
 }
-async function addTracerouteToIpList(routes){
+async function addTraceroutesToIpList(routes){
     return Promise.all(routes.map((tr) => {
         return addTracerouteToIpList(tr)
     }));
@@ -127,4 +127,4 @@ async function getOneTracerouteLocationInfo(src, tr){
 }
 
 module.exports = {getInfoForIp: getInfoForIpFromDb,
-    getTracerouteLocationInfo: getTraceroutesLocationInfo, insertIpWithLocation, getAllUserIpData, addTracerouteToIpList};
+    getTracerouteLocationInfo: getTraceroutesLocationInfo, insertIpWithLocation, getAllUserIpData, addTraceroutesToIpList};
