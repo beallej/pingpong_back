@@ -52,7 +52,7 @@ async function addTraceroutesToDb(routes){
                             "MERGE (node1)-[:PINGS {src: {srcIp}, dst: {dstIp}}]->(node2)",
                         params: {
                             node1Address: hop.address,
-                            node2Address: route[ind + 1].address,
+                            node2Address: routeList[ind + 1].address,
                             srcIp: route.src.address,
                             dstIp: route.dst.address
                         },
