@@ -91,6 +91,7 @@ async function addTracerouteToIpList(routes){
 }
 async function addTracerouteToIpList(route){
     let intermediateIPs = route.slice(1, -1);
+    console.log("INTERMED", intermediateIPs)
     return Promise.all(intermediateIPs.map((ip) => {
         return saveToDb(ip.address, ip.latitude, ip.longitude, ip.asn, ip.isp, IP_TYPES.INTERMEDIATE)
     }))
@@ -122,7 +123,6 @@ async function getOneTracerouteLocationInfo(src, tr){
     console.log(intermediateIpInfo.length, validIntermediateIpInfo.length)
     route = route.concat(intermediateIpInfo)
     route.push(dstNode);
-    console.log("route inside get1: ", route)
     return route;
 }
 

@@ -1,8 +1,6 @@
 var neo4j = require('neo4j');
 var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
 async function addTraceroutesToDb(routes){
-
-
     let nodeQueries = []
     routes.map((route) => {
         route.map((hop) => {
@@ -24,7 +22,6 @@ async function addTraceroutesToDb(routes){
                 lean: true
             })
         });
-        console.log("PING - QUERY", nodeQueries)
     });
     db.cypher({
         queries: nodeQueries,
@@ -60,7 +57,6 @@ async function addTraceroutesToDb(routes){
                 }
             })
         })
-        console.log("REL - QUERIES", relQueries);
         db.cypher({
             queries: relQueries,
         }, (err, batchResults) => {
