@@ -44,7 +44,7 @@ async function addTraceroutesToDb(routes){
             let routeList = [route.src];
             routeList = routeList.concat(route.intermediate);
             routeList.push(route.dst);
-            route.map((hop, ind) => {
+            routeList.map((hop, ind) => {
                 if (ind < route.length - 1) {
                     relQueries.push({
                         query: "MATCH (node1: IP), (node2: IP) " +
