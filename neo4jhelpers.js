@@ -6,9 +6,14 @@ async function addTraceroutesToDb(routes){
     let nodeQueries = []
     routes.map((route) => {
         route.map((hop) => {
-            // let label = "ip_" + hop.address
+            let query = "MERGE (:IP {address: {ipAddress}";
+            query += hop.latitude ? ", latitude: {ipLatitude}" : "";
+            query += hop.longitude ? ", longitude: {ipLongitude}" : "";
+            query += hop.asn ? ", asn: {ipAsn}" : "";
+            query += hop.isp ? ", isp: {ipIsp}" : "";
+            query += "})";
             nodeQueries.push({
-                query: "MERGE (:IP {address: {ipAddress}, latitude: {ipLatitude}, longitude: {ipLongitude}, asn: {ipAsn}, isp: {ipIsp}})",
+                query: query,
                 params: {
                     ipAddress: hop.address,
                     ipLatitude: hop.latitude,
@@ -40,7 +45,6 @@ async function addTraceroutesToDb(routes){
             let dst = route[route.length -1].address;
             route.map((hop, ind) => {
                 if (ind < route.length - 1) {
-                    // let label = "ping_from_" + hop.address + "_to_" + route[i+1].address + "_src_" + src + "_dst_" + dst;
                     relQueries.push({
                         query: "MATCH (node1: IP), (node2: IP) " +
                             "WHERE node1.address = {node1Address} AND node2.address = {node2Address} " +
