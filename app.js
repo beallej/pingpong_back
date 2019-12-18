@@ -1,6 +1,6 @@
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb} = require("./neo4jhelpers.js");
-const {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData} = require("./postgresHelpers");
+const {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData, addTracerouteToIpList} = require("./postgresHelpers");
 const express = require('express')
 var bodyParser  = require("body-parser");
 let fetch = require('node-fetch');
@@ -16,7 +16,7 @@ app.post('/traceroute',async function(request, response){
     let src = await getInfoForIp(request.body.src, IP_TYPES.USER);
     let routes = await getTracerouteLocationInfo(src, request.body.traceroutes);
     console.log("routes: ", routes);
-
+    let addTracerouteToIpList(routes); //TODO: FIX MODEL FOR LIST
     let createResult = await addTraceroutesToDb(routes);
 
 

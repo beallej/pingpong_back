@@ -84,6 +84,17 @@ async function getInfoForIp(ip, type){
     console.log("IPINFO:", ipInfo)
     return ipInfo;
 }
+async function addTracerouteToIpList(routes){
+    return Promise.all(routes.map((tr) => {
+        return addTracerouteToIpList(tr)
+    }));
+}
+async function addTracerouteToIpList(route){
+    let intermediateIPs = route.slice(1, -1);
+    return Promise.all(intermediateIPs.map((ip) => {
+        return saveToDb(ip.address, ip.latitude, ip.longitude, ip.asn, ip.isp, IP_TYPES.INTERMEDIATE)
+    }))
+}
 async function getTraceroutesLocationInfo(src, traceroutes){
 
     let routes = Promise.all(traceroutes.map((tr) => {
@@ -113,39 +124,7 @@ async function getOneTracerouteLocationInfo(src, tr){
     route.push(dstNode);
     console.log("route inside get1: ", route)
     return route;
-    // let tracerouteProm = tr.route.map((hop) => {
-    //     return getInfoForIp(hop, IP_TYPES.INTERMEDIATE)});
-    //
-    // Promise.all(tracerouteProm).then((chemin) => {
-    //     route.concat(chemin);
-    //     route.push(dstNode);
-    //     console.log("route: ", route)
-    //     return route;
-    // });
-    // return null;
 }
 
-/*
-* const tr = [1, 2, 3, 4, 5] //...an array filled with values
-
-const functionWithPromise = item => { //a function that returns a promise
-  return Promise.resolve('ok')
-}
-
-const getInfoForIp = async item => {
-  return functionWithPromise(item)
-}
-
-const getTracerouteLocationInfo = async () => {
-  return Promise.all(tr.map(item => getInfoForIp(item)))
-}
-
-
-
-
-
-getTraceroutesLocationInfo().then(data => {
-  console.log(data)
-})
-* */
-module.exports = {getInfoForIp: getInfoForIpFromDb, getTracerouteLocationInfo: getTraceroutesLocationInfo, insertIpWithLocation, getAllUserIpData};
+module.exports = {getInfoForIp: getInfoForIpFromDb,
+    getTracerouteLocationInfo: getTraceroutesLocationInfo, insertIpWithLocation, getAllUserIpData, addTracerouteToIpList};
