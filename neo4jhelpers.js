@@ -3,7 +3,6 @@ const neo4j = require('neo4j-driver');
 const graphenedbURL = process.env.GRAPHENEDB_BOLT_URL;
 const graphenedbUser = process.env.GRAPHENEDB_BOLT_USER;
 const graphenedbPass = process.env.GRAPHENEDB_BOLT_PASSWORD;
-const driver = neo4j.driver(graphenedbURL, neo4j.auth.basic(graphenedbUser, graphenedbPass));
 // const driver = neo4j.driver(process.env['GRAPHENEDB_URL']);
 
 
@@ -11,6 +10,8 @@ const driver = neo4j.driver(graphenedbURL, neo4j.auth.basic(graphenedbUser, grap
 // var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
 
 async function addTraceroutesToDb(routes){
+    const driver = neo4j.driver(graphenedbURL, neo4j.auth.basic(graphenedbUser, graphenedbPass));
+
     let session = driver.session();
     // let createQueryString = routes.map((route) => {
     //     let createString = "MERGE path =";
@@ -40,6 +41,7 @@ async function addTraceroutesToDb(routes){
         })
         let createResult = await session.run(createQueryString);
         session.close();
+        driver.close();
         return createResult
     }
     catch (e) {
