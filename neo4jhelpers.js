@@ -582,7 +582,7 @@ MATCH (a)-[:ACTED_IN]->(m)<-[:DIRECTED]-(d) RETURN a,m,d LIMIT 10
         let dst = route[route.length -1].address;
         route.map((hop) => {
             queries.push({
-                query: "MERGE (ip:IP {address: {ipAddress}, latitude: {ipLatitude}, longitude: {ipLongitude}, asn: {ipAsn}, isp: {ipIsp}}) RETURN ip",
+                query: "CREATE (ip:IP {address: {ipAddress}, latitude: {ipLatitude}, longitude: {ipLongitude}, asn: {ipAsn}, isp: {ipIsp}}) RETURN ip",
                 params: {
                     ipAddress: hop.address,
                     ipLatitude: hop.latitude,
@@ -598,7 +598,7 @@ MATCH (a)-[:ACTED_IN]->(m)<-[:DIRECTED]-(d) RETURN a,m,d LIMIT 10
                 queries.push({
                     query: "MATCH (node1: IP), (node2: IP) " +
                         "WHERE node1.address = {node1Address} AND node2.address = {node2Address} " +
-                        "MERGE (node1)-[r:PINGS {src: {srcIp}, dst: {dstIp}}]->(node2) RETURN r",
+                        "CREATE (node1)-[r:PINGS {src: {srcIp}, dst: {dstIp}}]->(node2) RETURN r",
                     params: {
                         node1Address: hop.address,
                         node2Address: route[ind + 1].address,
