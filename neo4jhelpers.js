@@ -44,8 +44,9 @@ async function addTraceroutesToDb(routes){
             let routeList = [route.src];
             routeList = routeList.concat(route.intermediate);
             routeList.push(route.dst);
+            console.log("ROUTELIST", routeList)
             routeList.map((hop, ind) => {
-                if (ind < route.length - 1) {
+                if (ind < routeList.length - 1) {
                     relQueries.push({
                         query: "MATCH (node1: IP), (node2: IP) " +
                             "WHERE node1.address = {node1Address} AND node2.address = {node2Address} " +
