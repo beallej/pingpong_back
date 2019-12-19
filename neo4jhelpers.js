@@ -50,12 +50,10 @@ async function addTraceroutesToDb(routes){
                     relQueries.push({
                         query: "MATCH (node1: IP), (node2: IP) " +
                             "WHERE node1.address = {node1Address} AND node2.address = {node2Address} " +
-                            "MERGE (node1)-[:PINGS {src: {srcIp}, dst: {dstIp}}]->(node2)",
+                            "MERGE (node1)-[:PINGS]->(node2)",
                         params: {
                             node1Address: hop.address,
-                            node2Address: routeList[ind + 1].address,
-                            srcIp: route.src.address,
-                            dstIp: route.dst.address
+                            node2Address: routeList[ind + 1].address
                         },
                         lean: true
                     })
