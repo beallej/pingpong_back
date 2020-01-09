@@ -7,7 +7,9 @@ async function addTraceroutesToDb(routes){
         routeList = routeList.concat(route.intermediate);
         routeList.push(route.dst);
         console.log("ROUTE", route)
+        console.log("ROUTELIST", routeList);
         routeList.map((hop) => {
+            console.log("hop", hop)
             let query = "MERGE (:IP {address: {ipAddress}";
             query += hop.latitude ? ", latitude: {ipLatitude}" : "";
             query += hop.longitude ? ", longitude: {ipLongitude}" : "";
