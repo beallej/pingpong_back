@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 
 app.post('/traceroute',async function(request, response){
     let src = await getInfoForIp(request.body.src, IP_TYPES.USER);
+    console.log("src", src, request.body.src);
     let routes = await getTracerouteLocationInfo(src, request.body.traceroutes);
     let ipListRes = await addTraceroutesToIpListPG(routes); //TODO: FIX MODEL FOR LIST
     console.log("IPLISTRES", ipListRes)
