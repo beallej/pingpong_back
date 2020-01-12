@@ -47,7 +47,7 @@ app.get('/traceroute/all', async function (request, response) {
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let allPings = await getAllPingData();
-        console.log("ALL PINGS", allPings)
+        console.log("ALL PINGS!", allPings)
         return response.status(200).send(allPings);
     } catch (err) {
         return response.status(500).end();

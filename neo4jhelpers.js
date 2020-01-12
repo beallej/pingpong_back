@@ -6,7 +6,6 @@ async function getAllPingData(){
         query: "MATCH (a)-[r:PINGS]-(b) RETURN a,b"
     }, (err, res) => {
         if (res){
-            console.log("RESULTS - PING", JSON.stringify(res))
             return JSON.stringify(res);
         }
         if (err){
