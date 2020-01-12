@@ -7,7 +7,7 @@ async function getAllPingData(){
     }, (err, res) => {
         if (res){
             console.log("RESULTS - PING", JSON.stringify(res))
-            return res
+            return JSON.stringify(res);
         }
         if (err){
             console.log("ERR", err)
