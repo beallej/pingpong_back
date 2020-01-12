@@ -47,6 +47,16 @@ async function getAllUserIpData() {
         return null;
     }
 }
+async function getAllIntermediateIpData() {
+    try {
+        const res = await client.query(QUERY_STRINGS.INTERMEDIATE.GET_ALL);
+        console.log(res.rows)
+        return res.rows;
+    } catch (err) {
+        console.log("error querying to db", err.stack)
+        return null;
+    }
+}
 
 async function insertIpWithLocation(ip, type) {
     let location = await getLocation(ip);
@@ -127,4 +137,4 @@ async function getOneTracerouteLocationInfo(src, tr){
 }
 
 module.exports = {getInfoForIp: getInfoForIpFromDb,
-    getTracerouteLocationInfo: getTraceroutesLocationInfo, insertIpWithLocation, getAllUserIpData, addTraceroutesToIpListPG: addTraceroutesToIpList};
+    getTracerouteLocationInfo: getTraceroutesLocationInfo, insertIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG: addTraceroutesToIpList};
