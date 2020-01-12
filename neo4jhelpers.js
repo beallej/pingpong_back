@@ -1,18 +1,17 @@
 var neo4j = require('neo4j');
 var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
 
-async function getAllPingData(){
-    let res = await db.cypher({
+async function getAllPingData(callbackSuccess, callbackErr){
+    await db.cypher({
         query: "MATCH (a)-[r:PINGS]-(b) RETURN a,b"
     }, (err, res) => {
         if (res){
-            return JSON.stringify(res);
+            callbackSuccess(JSON.stringify(res));
         }
         if (err){
-            console.log("ERR", err)
+            callbackErr(err)
         }
     });
-    return res;
 }
 
 
