@@ -1,5 +1,20 @@
 var neo4j = require('neo4j');
 var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
+
+async function getAllPingData(){
+    db.cypher({
+        query: "MATCH p=()-[r:PINGS]->() RETURN p",
+    }, (err, res) => {
+        if (res){
+            console.log("RESULTS - PING", JSON.stringify(res))
+            return res
+        }
+        if (err){
+            console.log("ERR", err)
+        }
+    });
+}
+
 async function addTraceroutesToDb(routes){
     let nodeQueries = []
     routes.map((route) => {
@@ -78,4 +93,4 @@ async function addTraceroutesToDb(routes){
 
 }
 
-module.exports = {addTraceroutesToDb};
+module.exports = {addTraceroutesToDb, getAllPingData};
