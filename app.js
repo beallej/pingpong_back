@@ -53,7 +53,7 @@ app.get('/traceroute/all', async function (request, response) {
             return response.status(500).end();
         };
         getAllPingData(callbackSuccess, callbackErr)
-     
+
     } catch (err) {
         return response.status(500).end();
     }
