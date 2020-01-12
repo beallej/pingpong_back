@@ -37,12 +37,24 @@ app.post('/ip/add',async function(request, response){
 
     let responseInfo = await insertIpWithLocation(ip, IP_TYPES.USER)
     response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com");
+    response.header("Access-Control-Allow-Origin", "https://localhost:1234");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     response.statusCode = responseInfo.statusCode;
     response.statusMessage = responseInfo.statusMessage;
     return response.end();
 
 });
+// app.get('/ip/all', async function (request, response) {
+//     response.header("Access-Control-Allow-Origin", "*");
+//     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//     try {
+//         let allIpInfo = await getAllUserIpData();
+//         console.log("all ip info: ", allIpInfo)
+//         return response.status(200).send(allIpInfo);
+//     } catch (err) {
+//         return response.status(500).end();
+//     }
+// })
 
 app.get('/ip/all', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
