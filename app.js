@@ -1,8 +1,6 @@
-import {getAllIntermediateIpData} from "./postgresHelpers";
-
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb} = require("./neo4jhelpers.js");
-const {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
+const {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
 const express = require('express')
 var bodyParser  = require("body-parser");
 
@@ -37,7 +35,7 @@ app.post('/ip/add',async function(request, response){
     ip =  ip.trim()  //remove extra newline char
 
     let responseInfo = await insertIpWithLocation(ip, IP_TYPES.USER)
-    response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com, https://localhost:1234");
+    response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     response.statusCode = responseInfo.statusCode;
     response.statusMessage = responseInfo.statusMessage;
