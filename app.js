@@ -44,6 +44,7 @@ app.post('/ip/add',async function(request, response){
 });
 app.get('/traceroute/all', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
+    response.header("Content-Type", "application/json")
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let callbackSuccess = (res) => {
