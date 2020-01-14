@@ -21,7 +21,7 @@ app.post('/traceroute',async function(request, response){
     // let createResult = await addTraceroutesToDb(routes);
     //
     //
-    // console.log(createResult);
+    console.log("REQUEST BODY", request.body);
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     response.statusCode = 200;
@@ -42,6 +42,7 @@ app.post('/ip/add',async function(request, response){
     return response.end();
 
 });
+
 app.get('/traceroute/all', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Content-Type", "application/json")
