@@ -87,7 +87,7 @@ app.get('/ip/all/address_only', async function (request, response) {
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let allIpInfo = await getAllUserIpData();
-        let justAddresses = allIpInfo.map((ip) => {return ip.address}).join(" ");
+        let justAddresses = allIpInfo.map((ip) => {return "\"" + ip.address + "\""}).join(" ");
         justAddresses = "(" + justAddresses + ")";
         console.log("just addresses: ", justAddresses)
         return response.status(200).send(justAddresses);
@@ -101,7 +101,7 @@ app.get('/ip/all/address_only2', async function (request, response) {
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let allIpInfo = await getAllUserIpData();
-        let justAddresses = allIpInfo.map((ip) => {return ip.address}).join(" ");
+        let justAddresses = allIpInfo.map((ip) => {return "\"" + ip.address + "\""}).join(" ");
         console.log("just addresses: ", justAddresses)
         return response.status(200).send(justAddresses);
     } catch (err) {
