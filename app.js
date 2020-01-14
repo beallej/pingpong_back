@@ -96,6 +96,18 @@ app.get('/ip/all/address_only', async function (request, response) {
     }
 })
 
+app.get('/ip/all/address_only2', async function (request, response) {
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    try {
+        let allIpInfo = await getAllUserIpData();
+        let justAddresses = allIpInfo.map((ip) => {return ip.address}).join(" ");
+        console.log("just addresses: ", justAddresses)
+        return response.status(200).send(justAddresses);
+    } catch (err) {
+        return response.status(500).end();
+    }
+})
 
 app.listen(process.env.PORT || 5000, () =>{})
 
