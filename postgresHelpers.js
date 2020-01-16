@@ -213,7 +213,7 @@ function condenseTracerouteData(traceroutes){
                         },
                         frequency: freqRelative
                     }
-                    if (!(srcLat === tarLat) && (srcLon === tarLon)) {
+                    if (!((srcLat === tarLat) && (srcLon === tarLon))) {
                         traceroutesCondensed.push(dataPoint)
                     }
                 })
