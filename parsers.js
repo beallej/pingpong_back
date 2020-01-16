@@ -1,4 +1,3 @@
-
 let fs = require('fs');
 
 
@@ -37,27 +36,39 @@ let fs = require('fs');
 *
 * */
 function parseTxt(txt){
+    let resJSON = {}
+    resJSON["traceroutes"] = []
     res = "{\"traceroute\" :" +"\n" +"\n" +"[ "
     var regExp = /\(([^)]+)\)/;//to match text between ()
     var i = 0 ; 
+    let compteur = 0 ; 
     while (i < txt.length-1) {
     if ( txt[i].includes("traceroute to")) { 
-        var y = i ; 
+         compteur++;
+         resJSON["traceroutes"]["traceroute"+compteur] = {}
+         var y = i ; 
         
 
         res+= "\n" + " { " +"\n" + "\"dst\": "
         var matches = regExp.exec(txt[i])
+        resJSON["traceroutes"]["traceroute"+compteur]["dst"] = matches[1]
+        resJSON["traceroutes"]["traceroute"+compteur]["route"] = []
         res+="\"" + matches[1] + "\"," +"\n" +" \"route\" : ["
         y++ ; 
         while (!txt[y].includes("traceroute to") && !txt[y].includes("Src is")) { 
             if ( !txt[y+1].includes("traceroute to")) {
             var matches2 = regExp.exec(txt[y])
-            if (matches2 !==null ) { res+= "\"" + matches2[1] + "\", " }
+            if (matches2 !==null ) { 
+                resJSON["traceroutes"]["traceroute"+compteur]["route"].push(matches2[1])
+                res+= "\"" + matches2[1] + "\", " 
+            }
             y++
             }
             if ( txt[y+1].includes("traceroute to") || txt[y+1].includes("Src is")) {
                 var matches2 = regExp.exec(txt[y])
-                if (matches2 !==null ) { res+= "\"" + matches2[1] }
+                if (matches2 !==null ) { 
+                    resJSON["traceroutes"]["traceroute"+compteur]["route"].push(matches2[1])
+                    res+= "\"" + matches2[1] }
                 y++
                 }
         }
@@ -69,8 +80,10 @@ function parseTxt(txt){
     }
 
     if (txt[i].includes("Src is")) { 
+
        
         i++ ; 
+        resJSON["src"] = li2[i];
         res+= "\n" + "]," + "\n" + "\"src\":" + li2[i] ; 
         res+= "\n" +"}"
     }
@@ -79,9 +92,9 @@ function parseTxt(txt){
          
   
    
-   
-    fs.writeFile("output.txt",res)
     
+    fs.writeFile("output.txt",resJSON.toString())
+    return resJSON;
 
 }
 
@@ -89,7 +102,10 @@ var data = fs.readFileSync('test.txt', 'utf8');
 
 li = data.split("\n")
 li2 = li.filter(el => !el.includes("* * *"))
-parseTxt(li2)
+result = parseTxt(li2)
+console.log(result)
+
+
 
 
 module.exports = {parseTxt};
