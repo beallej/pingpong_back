@@ -1,7 +1,7 @@
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb, getAllPingData} = require("./neo4jhelpers.js");
-const {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG, consdenseIPData, condenseTracerouteData} = require("./postgresHelpers");
-const {parseTxt} = require("./parsers");
+const {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
+const {parseTxt, consdenseIPData, condenseTracerouteData} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
 
