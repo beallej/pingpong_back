@@ -1,6 +1,7 @@
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb, getAllPingData} = require("./neo4jhelpers.js");
 const {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG, consdenseIPData, condenseTracerouteData} = require("./postgresHelpers");
+const {parseTxt} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
 
@@ -12,16 +13,13 @@ app.use(bodyParser.json());
 
 
 app.post('/traceroute',async function(request, response){
-    // let src = await getInfoForIp(request.body.src, IP_TYPES.USER);
-    // console.log("src", src, request.body.src);
-    // let routes = await getTracerouteLocationInfo(src, request.body.traceroutes);
-    // let ipListRes = await addTraceroutesToIpListPG(routes); //TODO: FIX MODEL FOR LIST
-    // console.log("IPLISTRES", ipListRes)
-    // console.log("ROUTES", routes)
-    // let createResult = await addTraceroutesToDb(routes);
-    //
-    //
     console.log("REQUEST BODY", request.body);
+    const traceroutesParsed = parseTxt(request.body);
+    let routes = await getTracerouteLocationInfo(traceroutesParsed.src, traceroutesParsed.traceroutes);
+    let ipListRes = await addTraceroutesToIpListPG(routes); //TODO: FIX MODEL FOR LIST
+    console.log("IPLISTRES", ipListRes)
+    console.log("ROUTES", routes)
+    let createResult = await addTraceroutesToDb(routes);
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     response.statusCode = 200;
