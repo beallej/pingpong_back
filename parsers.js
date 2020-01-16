@@ -38,64 +38,43 @@ let fs = require('fs');
 function parseTxt(txt){
     let resJSON = {}
     resJSON["traceroutes"] = []
-    res = "{\"traceroute\" :" +"\n" +"\n" +"[ "
     var regExp = /\(([^)]+)\)/;//to match text between ()
     var i = 0 ; 
-    let compteur = 0 ; 
     while (i < txt.length-1) {
-    if ( txt[i].includes("traceroute to")) { 
-         compteur++;
-         resJSON["traceroutes"]["traceroute"+compteur] = {}
-         var y = i ; 
-        
+        if ( txt[i].includes("traceroute to")) {
+             var y = i ;
+             let traceroute = {}
+            var matches = regExp.exec(txt[i])
 
-        res+= "\n" + " { " +"\n" + "\"dst\": "
-        var matches = regExp.exec(txt[i])
-        resJSON["traceroutes"]["traceroute"+compteur]["dst"] = matches[1]
-        resJSON["traceroutes"]["traceroute"+compteur]["route"] = []
-        res+="\"" + matches[1] + "\"," +"\n" +" \"route\" : ["
-        y++ ; 
-        while (!txt[y].includes("traceroute to") && !txt[y].includes("Src is")) { 
-            if ( !txt[y+1].includes("traceroute to")) {
-            var matches2 = regExp.exec(txt[y])
-            if (matches2 !==null ) { 
-                resJSON["traceroutes"]["traceroute"+compteur]["route"].push(matches2[1])
-                res+= "\"" + matches2[1] + "\", " 
-            }
-            y++
-            }
-            if ( txt[y+1].includes("traceroute to") || txt[y+1].includes("Src is")) {
+            traceroute["dst"] = matches[1]
+            traceroute["route"] = []
+            y++ ;
+            while (!txt[y].includes("traceroute to") && !txt[y].includes("Src is")) {
+                if ( !txt[y+1].includes("traceroute to")) {
                 var matches2 = regExp.exec(txt[y])
-                if (matches2 !==null ) { 
-                    resJSON["traceroutes"]["traceroute"+compteur]["route"].push(matches2[1])
-                    res+= "\"" + matches2[1] }
+                if (matches2 !==null ) {
+                    traceroute["route"].push(matches2[1])
+                }
                 y++
                 }
+                if ( txt[y+1].includes("traceroute to") || txt[y+1].includes("Src is")) {
+                    var matches2 = regExp.exec(txt[y])
+                    if (matches2 !==null ) {
+                        traceroute["route"].push(matches2[1])
+                        }
+                    y++
+                    }
+            }
+            resJSON.traceroutes.push(traceroute)
+            i = y ;
         }
-       
-        i = y ; 
-        res+= " ]" +"\n" + "},"
 
-
+        if (txt[i].includes("Src is")) {
+            i++ ;
+            resJSON["src"] = li2[i];
+        }
     }
-
-    if (txt[i].includes("Src is")) { 
-
-       
-        i++ ; 
-        resJSON["src"] = li2[i];
-        res+= "\n" + "]," + "\n" + "\"src\":" + li2[i] ; 
-        res+= "\n" +"}"
-    }
-}
-    
-         
-  
-   
-    
-    fs.writeFile("output.txt",resJSON.toString())
     return resJSON;
-
 }
 
 var data = fs.readFileSync('test.txt', 'utf8');
@@ -103,7 +82,7 @@ var data = fs.readFileSync('test.txt', 'utf8');
 li = data.split("\n")
 li2 = li.filter(el => !el.includes("* * *"))
 result = parseTxt(li2)
-console.log(result)
+console.log(JSON.stringify(result))
 
 
 
