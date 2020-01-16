@@ -1,6 +1,6 @@
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb, getAllPingData} = require("./neo4jhelpers.js");
-const {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
+const {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG, consdenseIPData, condenseTracerouteData} = require("./postgresHelpers");
 const express = require('express')
 var bodyParser  = require("body-parser");
 
@@ -43,13 +43,14 @@ app.post('/ip/add',async function(request, response){
 
 });
 
-app.get('/traceroute/all', async function (request, response) {
+app.get('/traceroutes/all/condensed', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Content-Type", "application/json")
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let callbackSuccess = (res) => {
-            return response.status(200).send(res)
+            let traceroutesCondensed = condenseTracerouteData(res);
+            return response.status(200).send(traceroutesCondensed)
         };
         let callbackErr = (err) => {
             return response.status(500).end();
@@ -60,6 +61,20 @@ app.get('/traceroute/all', async function (request, response) {
         return response.status(500).end();
     }
 })
+app.get('/ip/all/condensed', async function (request, response) {
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    try {
+        let allUserIpInfo = await getAllUserIpData();
+        let allIntermediateIpInfo = await getAllIntermediateIpData();
+        let ipInfoCondensed = consdenseIPData(allUserIpInfo, allIntermediateIpInfo);
+        console.log("all ip info: ", ipInfoCondensed)
+        return response.status(200).send(ipInfoCondensed);
+    } catch (err) {
+        return response.status(500).end();
+    }
+})
+
 app.get('/ip/intermediate/all', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
