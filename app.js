@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 
 app.post('/traceroute',async function(request, response){
-    console.log("REQUEST BODY", request.body.toString());
+    console.log("REQUEST BODY", Object.keys(request.body));
     const traceroutesParsed = parseTxt(request.body.toString());
     let routes = await getTracerouteLocationInfo(traceroutesParsed.src, traceroutesParsed.traceroutes);
     await insertIpWithLocation(traceroutesParsed.src, IP_TYPES.USER);
