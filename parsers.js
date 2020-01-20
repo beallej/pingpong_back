@@ -1,6 +1,11 @@
 function parseTxt(txtRaw){
     console.log("type " + typeof txtRaw)
-    let lines = txtRaw.split("\n")
+
+    let srcRegEx = /\%SRC\%(.*)\%END_SRC\%/;
+    let srcMatches = srcRegEx.exec(txt);
+    let src = srcMatches[0];
+    console.log("SRC", src)
+    let lines = txtRaw.split("%%")
     let txt = lines.filter(el => !el.includes("* * *"))
 
 
