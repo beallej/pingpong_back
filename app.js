@@ -13,8 +13,8 @@ app.use(bodyParser.json());
 
 
 app.post('/traceroute',async function(request, response){
-    console.log("REQUEST BODY", request.body.prototype);
-    const traceroutesParsed = parseTxt(request.body.prototype);
+    console.log("REQUEST BODY", Object.getPrototypeOf(request.body));
+    const traceroutesParsed = parseTxt(Object.getPrototypeOf(request.body));
     let routes = await getTracerouteLocationInfo(traceroutesParsed.src, traceroutesParsed.traceroutes);
     await insertIpWithLocation(traceroutesParsed.src, IP_TYPES.USER);
     let ipListRes = await addTraceroutesToIpListPG(routes); //TODO: FIX MODEL FOR LIST
