@@ -1,5 +1,5 @@
 function parseTxt(txtRaw){
-
+    console.log("type " + typeof txtRaw)
     let lines = txtRaw.split("\n")
     let txt = lines.filter(el => !el.includes("* * *"))
 
