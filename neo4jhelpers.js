@@ -46,17 +46,19 @@ async function addTraceroutesToDb(routes){
             });
         }
     });
-    db.cypher({
-        queries: nodeQueries,
-    }, (err, batchResults) => {
-        if (batchResults){
-            console.log("RESULTS - IP", JSON.stringify(batchResults))
-            addPingRelationships()
-        }
-        if (err){
-            console.log("ERR", err)
-        }
-    });
+    if (nodeQueries.length > 0){
+        db.cypher({
+            queries: nodeQueries,
+        }, (err, batchResults) => {
+            if (batchResults){
+                console.log("RESULTS - IP", JSON.stringify(batchResults))
+                addPingRelationships()
+            }
+            if (err){
+                console.log("ERR", err)
+            }
+        });
+    }
 
     function addPingRelationships() {
         let relQueries = [];
