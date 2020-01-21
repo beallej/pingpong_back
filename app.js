@@ -23,7 +23,7 @@ app.post('/traceroute',async function(request, response){
         let ipListRes = await addTraceroutesToIpListPG(routes); //TODO: FIX MODEL FOR LIST
         console.log("IPLISTRES", ipListRes)
         console.log("ROUTES", routes)
-        let createResult = await addTraceroutesToDb(routes);
+        // let createResult = await addTraceroutesToDb(routes);
         response.header("Access-Control-Allow-Origin", "*");
         response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         response.statusCode = 200;
