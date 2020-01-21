@@ -16,9 +16,11 @@ function parseTxt(txtRaw){
         let dstRes = dstRegEx.exec(tr);
         let dst = dstRes[1];
         let trObj = {dst: dst, route: []};
-        var regExAddress = /\(([^)]+)\)/g;//to match text between ()
+        let regExAddress = /(?!(traceroute to .*))\(([^)]+)\)(?!.*hops max)/g; //to match text between ()
+        // var regExAddress = /\(([^)]+)\)/g;//to match text between ()
         let addressResult;
         while(addressResult = regExAddress.exec(tr)) {
+            let hop = addressResult[1];
             trObj.route.push(addressResult[1])
         }
         resJSON.traceroutes.push(trObj)
