@@ -22,8 +22,8 @@ async function addTraceroutesToDb(routes){
             let routeList = [route.src];
             routeList = routeList.concat(route.intermediate);
             routeList.push(route.dst);
-            console.log("ROUTE", route)
-            console.log("ROUTELIST", routeList);
+            // console.log("ROUTE", route)
+            console.log("ROUTELIST!!", routeList);
             routeList.map((hop) => {
                 console.log("hop", hop)
                 let query = "MERGE (:IP {address: {ipAddress}";
@@ -46,6 +46,7 @@ async function addTraceroutesToDb(routes){
             });
         }
     });
+    console.log("QUERIES", nodeQueries)
     if (nodeQueries.length > 0){
         db.cypher({
             queries: nodeQueries,
