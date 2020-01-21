@@ -20,8 +20,8 @@ function parseTxt(txtRaw){
         // var regExAddress = /\(([^)]+)\)/g;//to match text between ()
         let addressResult;
         while(addressResult = regExAddress.exec(tr)) {
-            let hop = addressResult[1];
-            trObj.route.push(addressResult[1])
+            console.log(addressResult)
+            trObj.route.push(addressResult[2])
         }
         resJSON.traceroutes.push(trObj)
     }
@@ -116,6 +116,6 @@ function condenseTracerouteData(traceroutes){
 
 }
 // var fs = require('fs');
-// var txt = fs.readFileSync('test.txt').toString()
+// var txt = fs.readFileSync('test2.txt').toString()
 // console.log(JSON.stringify(parseTxt(txt)))
 module.exports = {parseTxt, consdenseIPData, condenseTracerouteData};
