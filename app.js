@@ -28,7 +28,6 @@ app.post('/traceroute',async function(request, response){
     response.statusCode = 200;
     response.statusMessage = "Traceroutes successsfully added";
     return response.end()
-
 });
 
 app.post('/ip/add',async function(request, response){
