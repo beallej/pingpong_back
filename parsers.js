@@ -1,51 +1,27 @@
 function parseTxt(txtRaw){
-    console.log("type " + typeof txtRaw)
-
-    let srcRegEx = /\%SRC\%(.*)\%END_SRC\%/;
-    let srcMatches = srcRegEx.exec(txt);
-    let src = srcMatches[0];
-    console.log("SRC", src)
-    let lines = txtRaw.split("%%")
-    let txt = lines.filter(el => !el.includes("* * *"))
-
-
+    let srcRegEx = /__SRC__(.*)__END_SRC__/;
+    let srcMatches = srcRegEx.exec(txtRaw);
+    let src = srcMatches[1];
+    console.log("SRC!", srcMatches)
+    let trRegEx = /__BEGIN_([0-9]+)_TR__(.*)__END_(\1)_TR__/g;
     let resJSON = {}
-    resJSON["traceroutes"] = []
-    var regExp = /\(([^)]+)\)/;//to match text between ()
-    var i = 0 ; 
-    while (i < txt.length-1) {
-        if ( txt[i].includes("traceroute to")) {
-             var y = i ;
-             let traceroute = {}
-            var matches = regExp.exec(txt[i])
+    resJSON["src"] = src;
+    resJSON["traceroutes"] = [];
+    let result;
 
-            traceroute["dst"] = matches[1]
-            traceroute["route"] = []
-            y++ ;
-            while (!txt[y].includes("traceroute to") && !txt[y].includes("Src is")) {
-                if ( !txt[y+1].includes("traceroute to")) {
-                var matches2 = regExp.exec(txt[y])
-                if (matches2 !==null ) {
-                    traceroute["route"].push(matches2[1])
-                }
-                y++
-                }
-                if ( txt[y+1].includes("traceroute to") || txt[y+1].includes("Src is")) {
-                    var matches2 = regExp.exec(txt[y])
-                    if (matches2 !==null ) {
-                        traceroute["route"].push(matches2[1])
-                        }
-                    y++
-                    }
-            }
-            resJSON.traceroutes.push(traceroute)
-            i = y ;
+    while (result = trRegEx.exec(txtRaw)) {
+        console.log(result[2], "\n\n");
+        let tr = result[2];
+        let dstRegEx =  /__DST__(.*)__END_DST__/;
+        let dstRes = dstRegEx.exec(tr);
+        let dst = dstRes[1];
+        let trObj = {dst: dst, route: []};
+        var regExAddress = /\(([^)]+)\)/g;//to match text between ()
+        let addressResult;
+        while(addressResult = regExAddress.exec(tr)) {
+            trObj.route.push(addressResult[1])
         }
-
-        if (txt[i].includes("Src is")) {
-            i++ ;
-            resJSON["src"] = txt[i];
-        }
+        resJSON.traceroutes.push(trObj)
     }
     return resJSON;
 }
@@ -137,5 +113,7 @@ function condenseTracerouteData(traceroutes){
     return traceroutesCondensed;
 
 }
-
+// var fs = require('fs');
+// var txt = fs.readFileSync('test.txt').toString()
+// console.log(JSON.stringify(parseTxt(txt)))
 module.exports = {parseTxt, consdenseIPData, condenseTracerouteData};
