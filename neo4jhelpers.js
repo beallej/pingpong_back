@@ -18,31 +18,33 @@ async function getAllPingData(callbackSuccess, callbackErr){
 async function addTraceroutesToDb(routes){
     let nodeQueries = []
     routes.map((route) => {
-        let routeList = [route.src];
-        routeList = routeList.concat(route.intermediate);
-        routeList.push(route.dst);
-        console.log("ROUTE", route)
-        console.log("ROUTELIST", routeList);
-        routeList.map((hop) => {
-            console.log("hop", hop)
-            let query = "MERGE (:IP {address: {ipAddress}";
-            query += hop.latitude ? ", latitude: {ipLatitude}" : "";
-            query += hop.longitude ? ", longitude: {ipLongitude}" : "";
-            query += hop.asn ? ", asn: {ipAsn}" : "";
-            query += hop.isp ? ", isp: {ipIsp}" : "";
-            query += "})";
-            nodeQueries.push({
-                query: query,
-                params: {
-                    ipAddress: hop.address,
-                    ipLatitude: hop.latitude,
-                    ipLongitude: hop.longitude,
-                    ipAsn: hop.asn,
-                    ipIsp: hop.isp
-                },
-                lean: true
-            })
-        });
+        if (route.intermediate.length > 0) {
+            let routeList = [route.src];
+            routeList = routeList.concat(route.intermediate);
+            routeList.push(route.dst);
+            console.log("ROUTE", route)
+            console.log("ROUTELIST", routeList);
+            routeList.map((hop) => {
+                console.log("hop", hop)
+                let query = "MERGE (:IP {address: {ipAddress}";
+                query += hop.latitude ? ", latitude: {ipLatitude}" : "";
+                query += hop.longitude ? ", longitude: {ipLongitude}" : "";
+                query += hop.asn ? ", asn: {ipAsn}" : "";
+                query += hop.isp ? ", isp: {ipIsp}" : "";
+                query += "})";
+                nodeQueries.push({
+                    query: query,
+                    params: {
+                        ipAddress: hop.address,
+                        ipLatitude: hop.latitude,
+                        ipLongitude: hop.longitude,
+                        ipAsn: hop.asn,
+                        ipIsp: hop.isp
+                    },
+                    lean: true
+                })
+            });
+        }
     });
     db.cypher({
         queries: nodeQueries,
