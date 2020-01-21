@@ -32,17 +32,22 @@ async function addTraceroutesToDb(routes){
                 query += hop.asn ? ", asn: {ipAsn}" : "";
                 query += hop.isp ? ", isp: {ipIsp}" : "";
                 query += "})";
-                nodeQueries.push({
-                    query: query,
-                    params: {
-                        ipAddress: hop.address,
-                        ipLatitude: hop.latitude,
-                        ipLongitude: hop.longitude,
-                        ipAsn: hop.asn,
-                        ipIsp: hop.isp
-                    },
-                    lean: true
-                })
+                if (hop.address && hop.longitude && hop.latitude){
+                    let params = {ipAddress: hop.address, ipLatitude: hop.latitude, longitude: hop.longitude}
+                    if (hop.asn) params.ipAsn = hop.asn;
+                    if (hop.isp) params.isp = hop.isp;
+                    nodeQueries.push({
+                        query: query,
+                        params: {
+                            ipAddress: hop.address,
+                            ipLatitude: parseFloat(hop.latitude),
+                            ipLongitude: parseFloat(hop.longitude),
+                            ipAsn: hop.asn,
+                            ipIsp: hop.isp
+                        },
+                        lean: true
+                    })
+                }
             });
         }
     });
