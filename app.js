@@ -13,21 +13,25 @@ app.use(bodyParser.json());
 
 
 app.post('/traceroute',async function(request, response){
-    console.log("REQUEST BODY", Object.keys(request.body), "VALUES", Object.values(request.body));
-    let body = Object.keys(request.body)[0];
-    const traceroutesParsed = parseTxt(body);
-    console.log("PARSED", traceroutesParsed)
-    let routes = await getTracerouteLocationInfo(traceroutesParsed.src, traceroutesParsed.traceroutes);
-    await insertIpWithLocation(traceroutesParsed.src, IP_TYPES.USER);
-    let ipListRes = await addTraceroutesToIpListPG(routes); //TODO: FIX MODEL FOR LIST
-    console.log("IPLISTRES", ipListRes)
-    console.log("ROUTES", routes)
-    let createResult = await addTraceroutesToDb(routes);
-    response.header("Access-Control-Allow-Origin", "*");
-    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    response.statusCode = 200;
-    response.statusMessage = "Traceroutes successsfully added";
-    return response.end()
+    try {
+        console.log("REQUEST BODY", Object.keys(request.body), "VALUES", Object.values(request.body));
+        let body = Object.keys(request.body)[0];
+        const traceroutesParsed = parseTxt(body);
+        console.log("PARSED", traceroutesParsed)
+        let routes = await getTracerouteLocationInfo(traceroutesParsed.src, traceroutesParsed.traceroutes);
+        await insertIpWithLocation(traceroutesParsed.src, IP_TYPES.USER);
+        let ipListRes = await addTraceroutesToIpListPG(routes); //TODO: FIX MODEL FOR LIST
+        console.log("IPLISTRES", ipListRes)
+        console.log("ROUTES", routes)
+        let createResult = await addTraceroutesToDb(routes);
+        response.header("Access-Control-Allow-Origin", "*");
+        response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        response.statusCode = 200;
+        response.statusMessage = "Traceroutes successsfully added";
+        return response.end()
+    }  catch (err) {
+        return response.status(500).end();
+    }
 });
 
 app.post('/ip/add',async function(request, response){
