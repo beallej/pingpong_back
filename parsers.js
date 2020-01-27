@@ -4,7 +4,7 @@ function parseTxt(txtRaw){
     console.log("txt", txt)
     let srcRegEx = /__SRC__(.*)__END_SRC__/;
     let srcMatches = srcRegEx.exec(txt);
-    let src = srcMatches[1];
+    let src = srcMatches[1].trim();
     console.log("SRC!", srcMatches)
     let trRegEx = /__BEGIN_([0-9]+)_TR__(.*)__END_(\1)_TR__/g;
     let resJSON = {}
@@ -17,7 +17,7 @@ function parseTxt(txtRaw){
         let tr = result[2];
         let dstRegEx =  /__DST__(.*)__END_DST__/;
         let dstRes = dstRegEx.exec(tr);
-        let dst = dstRes[1];
+        let dst = dstRes[1].trim();
         let trObj = {dst: dst, route: []};
         let regExAddress = /(?!(traceroute to .*))\(([^)]+)\)(?!.*hops max)/g; //to match text between ()
         // var regExAddress = /\(([^)]+)\)/g;//to match text between ()
