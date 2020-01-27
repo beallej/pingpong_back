@@ -1,5 +1,6 @@
 function parseTxt(txtRaw){
     let txt = txtRaw.replace('\n', '');
+    console.log("txt", txt)
     let srcRegEx = /__SRC__(.*)__END_SRC__/;
     let srcMatches = srcRegEx.exec(txt);
     let src = srcMatches[1];
