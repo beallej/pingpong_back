@@ -1,6 +1,7 @@
 function parseTxt(txtRaw){
+    let txt = txtRaw.replace('\n', '');
     let srcRegEx = /__SRC__(.*)__END_SRC__/;
-    let srcMatches = srcRegEx.exec(txtRaw);
+    let srcMatches = srcRegEx.exec(txt);
     let src = srcMatches[1];
     console.log("SRC!", srcMatches)
     let trRegEx = /__BEGIN_([0-9]+)_TR__(.*)__END_(\1)_TR__/g;
@@ -9,7 +10,7 @@ function parseTxt(txtRaw){
     resJSON["traceroutes"] = [];
     let result;
 
-    while (result = trRegEx.exec(txtRaw)) {
+    while (result = trRegEx.exec(txt)) {
         console.log(result[2], "\n\n");
         let tr = result[2];
         let dstRegEx =  /__DST__(.*)__END_DST__/;
