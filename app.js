@@ -20,7 +20,7 @@ app.post('/traceroute',async function(request, response){
         console.log("PARSED", JSON.stringify(traceroutesParsed))
         await insertIpWithLocation(traceroutesParsed.src, IP_TYPES.USER);
         let routes = await getTracerouteLocationInfo(traceroutesParsed.src, traceroutesParsed.traceroutes);
-        let ipListRes = await addTraceroutesToIpListPG(routes); //TODO: FIX MODEL FOR LIST
+        let ipListRes = await addTraceroutesToIpListPG(routes);
         console.log("IPLISTRES", ipListRes)
         console.log("ROUTES", routes)
         let createResult = await addTraceroutesToDb(routes);
@@ -39,7 +39,7 @@ app.post('/ip/add',async function(request, response){
     ip =  ip.trim()  //remove extra newline char
 
     let responseInfo = await insertIpWithLocation(ip, IP_TYPES.USER)
-    response.header("Access-Control-Allow-Origin", "https://pure-fortress-53953.herokuapp.com");
+    response.header("Access-Control-Allow-Origin", "https://pingpong-athena.herokuapp.com/");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     response.statusCode = responseInfo.statusCode;
     response.statusMessage = responseInfo.statusMessage;
