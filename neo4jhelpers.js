@@ -1,5 +1,6 @@
 var neo4j = require('neo4j');
 var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
+// var db = new neo4j.GraphDatabase("https://app151487501-VwY7YW:b.P6RJJloKWzKr.0ht1di6M04JrJY00@hobby-pmmgfgnijmdigbkeahdnfedl.dbs.graphenedb.com:24780")
 
 async function getAllPingData(callbackSuccess, callbackErr){
     await db.cypher({
@@ -103,4 +104,24 @@ async function addTraceroutesToDb(routes){
 
 }
 
+function fixData(address, lat, lon, isp, asn){
+    let query = "MATCH (n { address: '" + address + "'})\n" +
+        "SET n.latitude = " + lat + "\n" +
+        "SET n.longitude = " + lon + "\n" +
+        "SET n.isp = '" + isp + "'\n"+
+        "SET n.asn = '" + asn + "'\n"+
+        "RETURN n.address, n.latitude, n.longitude, n.asn, n.isp";
+
+    db.cypher({
+        query: query,
+    }, (err, batchResults) => {
+        if (batchResults){
+            console.log("RESULTS - IP", JSON.stringify(batchResults[0]))
+        }
+        if (err){
+            console.log("ERR", err)
+        }
+    });
+}
+// fixData("130.117.50.134", "48.8602294921875", "2.3410699367523193", "Cogent Communications", "AS174")
 module.exports = {addTraceroutesToDb, getAllPingData};

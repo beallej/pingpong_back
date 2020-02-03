@@ -1,5 +1,5 @@
 const {IP_TYPES, QUERY_STRINGS} = require("./constants");
-const {getLocation} = require("./ipLocateHelpers");
+const {getLocationMultipleAPIs} = require("./ipLocateHelpers");
 const { Client } = require('pg');
 
 const client = new Client({
@@ -59,7 +59,7 @@ async function getAllIntermediateIpData() {
 }
 
 async function insertIpWithLocation(ip, type) {
-    let location = await getLocation(ip);
+    let location = await getLocationMultipleAPIs(ip);
     console.log("ip: " , ip);
     console.log("location: ", location);
     let dbRes;
@@ -86,7 +86,7 @@ async function getInfoForIp(ip, type){
     let ipInfo;
     const dbRes = await getInfoForIpFromDb(ip, type);
     if (!dbRes) {
-        ipInfo = await getLocation(ip);
+        ipInfo = await getLocationMultipleAPIs(ip);
         ipInfo.address = ip;
     } else {
         ipInfo = dbRes;
