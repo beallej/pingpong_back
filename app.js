@@ -1,6 +1,6 @@
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb, getAllPingData} = require("./neo4jhelpers.js");
-const {getInfoForIp, getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
+const {getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
 const {parseTxt, consdenseIPData, condenseTracerouteData} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
@@ -11,18 +11,19 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
-
+/*** Add information from execution of script to gather traceroutes.
+ *  Body is sent as txt file ***/
 app.post('/traceroute',async function(request, response){
     try {
-        console.log("REQUEST BODY", Object.keys(request.body), "VALUES", Object.values(request.body));
         let body = Object.keys(request.body)[0];
         const traceroutesParsed = parseTxt(body);
-        console.log("PARSED", JSON.stringify(traceroutesParsed))
+
+        console.log("TRACEROUTES", JSON.stringify(traceroutesParsed))
         await insertIpWithLocation(traceroutesParsed.src, IP_TYPES.USER);
         let routes = await getTracerouteLocationInfo(traceroutesParsed.src, traceroutesParsed.traceroutes);
         let ipListRes = await addTraceroutesToIpListPG(routes);
-        console.log("IPLISTRES", ipListRes)
-        console.log("ROUTES", routes)
+
+        console.log("ROUTES WITH LOCATION INFP", routes)
         let createResult = await addTraceroutesToDb(routes);
         response.header("Access-Control-Allow-Origin", "*");
         response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -34,6 +35,11 @@ app.post('/traceroute',async function(request, response){
     }
 });
 
+/*** ADD A USER IP ADDRESS
+ *
+ * body: {ip: <ip address>}
+ *
+ * ***/
 app.post('/ip/add',async function(request, response){
     let ip = request.body.ip;
     ip =  ip.trim()  //remove extra newline char
@@ -47,6 +53,25 @@ app.post('/ip/add',async function(request, response){
 
 });
 
+/*** RETURN A LIST OF ALL THE TRACEROUTES. Data is condensed to lat/lon points (multiple ip addresses can share the same location),
+ * and the frequency of the given path taken (how often is is taken compared to other paths) is also returned.
+ *
+ *response body :
+ * {
+ *     [
+ *         {src:
+ *              {latitude: 48.6,
+                 longitude: 2.3
+                },
+            target: {
+                latitude: 45.6,
+                longitude: 3.3
+            },
+            frequency: 0.4
+           },
+ *     ]
+ * }
+ * ***/
 app.get('/traceroutes/all/condensed', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Content-Type", "application/json")
@@ -66,6 +91,21 @@ app.get('/traceroutes/all/condensed', async function (request, response) {
         return response.status(500).end();
     }
 })
+
+
+/***
+ * Gets all the latitude/longitude points with ip addresses that have been pinged, for the map.
+ *
+ * response body:
+ *  [
+ *      { latitude: 48.8582,
+ *        longitude: 2.3387,
+ *        label: "ISPs: Renater, SFR SA, Orange",   //  a label for the point on the map, a concatenated list of ISPs
+ *        type: "INTERMEDIATE"  // whether this is a user IP or an ip pinged during a traceroute
+ *      },
+ *  ]
+ *
+ * ***/
 app.get('/ip/all/condensed', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -80,6 +120,20 @@ app.get('/ip/all/condensed', async function (request, response) {
     }
 })
 
+/***
+ * Gets all the ip addresses that were discovered during a traceroute (not user ips).
+ *
+ * response body:
+ *  [
+ *      { address: "123.45.678",
+ *        latitude: 48.8582,
+ *        longitude: 2.3387,
+ *        asn: "AS123",
+ *        isp: "ISPs: Renater",
+ *      },
+ *  ]
+ *
+ * ***/
 app.get('/ip/intermediate/all', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -91,6 +145,22 @@ app.get('/ip/intermediate/all', async function (request, response) {
         return response.status(500).end();
     }
 })
+
+
+/***
+ * Gets all the user ip addresses.
+ *
+ * response body:
+ *  [
+ *      { address: "123.45.678",
+ *        latitude: 48.8582,
+ *        longitude: 2.3387,
+ *        asn: "AS123",
+ *        isp: "ISPs: Renater"
+ *      },
+ *  ]
+ *
+ * ***/
 app.get('/ip/all', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -103,6 +173,13 @@ app.get('/ip/all', async function (request, response) {
     }
 })
 
+/***
+ * Gets all the user ip addresses without extra info, concatenated with a comma. Used by the sh file to fetch the ips to traceroute.
+ *
+ * response body:
+ *  "123.45.678,910.11.121,314.15.161"
+ *
+ * ***/
 app.get('/ip/all/address_only', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");

@@ -1,4 +1,7 @@
-const IP_TYPES = Object.freeze({'USER': 'USER', 'INTERMEDIATE': "INTERMEDIATE"})
+/*** types of ip addresses, user or intermediate (discoverered during tracerotue) ***/
+const IP_TYPES = Object.freeze({'USER': 'USER', 'INTERMEDIATE': "INTERMEDIATE"});
+
+/*** Query templates to use with postgres ***/
 const QUERY_STRINGS = Object.freeze({
     'USER': {
         'CREATE': 'INSERT INTO IP_INFO(ADDRESS, LATITUDE, LONGITUDE, ASN, ISP) VALUES($1, $2, $3, $4, $5) RETURNING *',
