@@ -1,6 +1,6 @@
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb, getAllPingData} = require("./neo4jhelpers.js");
-const {getTracerouteLocationInfo, insertIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
+const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
 const {parseTxt, consdenseIPData, condenseTracerouteData} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
@@ -19,7 +19,7 @@ app.post('/traceroute',async function(request, response){
         const traceroutesParsed = parseTxt(body);
 
         console.log("TRACEROUTES", JSON.stringify(traceroutesParsed))
-        await insertIpWithLocation(traceroutesParsed.src, IP_TYPES.USER);
+        await insertUserIpWithLocation(traceroutesParsed.src);
         let routes = await getTracerouteLocationInfo(traceroutesParsed.src, traceroutesParsed.traceroutes);
         let ipListRes = await addTraceroutesToIpListPG(routes);
 
@@ -44,7 +44,7 @@ app.post('/ip/add',async function(request, response){
     let ip = request.body.ip;
     ip =  ip.trim()  //remove extra newline char
 
-    let responseInfo = await insertIpWithLocation(ip, IP_TYPES.USER)
+    let responseInfo = await insertUserIpWithLocation(ip)
     response.header("Access-Control-Allow-Origin", "https://pingpong-athena.herokuapp.com/");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     response.statusCode = responseInfo.statusCode;

@@ -1,26 +1,45 @@
+
+/*** Parse the body sent from pingpong.sh curl or wget command containing traceroute info.
+ * params: txtRaw: the traceroute info as a string
+ * ***/
 function parseTxt(txtRaw){
+
+    //remove new line chars (if they exist, different for different OS)
     let txt = txtRaw.replace(/\n|\r/g,'');
 
+    //parse src ip
     let srcRegEx = /__SRC__(.*)__END_SRC__/;
     let srcMatches = srcRegEx.exec(txt);
     let src = srcMatches[1].trim();
-    console.log("SRC!", srcMatches)
-    let trRegEx = /__BEGIN_([0-9]+)_TR__(.*)__END_(\1)_TR__/g;
+    console.log("SRC: ", srcMatches);
+
+    //set up response obj
     let resJSON = {}
     resJSON["src"] = src;
     resJSON["traceroutes"] = [];
-    let result;
 
+
+    //parse traceroutes
+    let result;
+    let trRegEx = /__BEGIN_([0-9]+)_TR__(.*)__END_(\1)_TR__/g;
+
+    //for each traceroute
     while (result = trRegEx.exec(txt)) {
-        console.log(result[2], "\n\n");
+
+        //tr is one traceroute as a raw string
         let tr = result[2];
+
+        //parse dst from traceroute
         let dstRegEx =  /__DST__(.*)__END_DST__/;
         let dstRes = dstRegEx.exec(tr);
         let dst = dstRes[1].trim();
+
+        //parse traceroute body
         let trObj = {dst: dst, route: []};
         let regExAddress = /(?!(traceroute to .*))\(([^)]+)\)(?!.*hops max)/g; //to match text between ()
-        // var regExAddress = /\(([^)]+)\)/g;//to match text between ()
         let addressResult;
+
+        //parse out addresses found
         while(addressResult = regExAddress.exec(tr)) {
             console.log(addressResult)
             trObj.route.push(addressResult[2])
@@ -30,7 +49,59 @@ function parseTxt(txtRaw){
     return resJSON;
 }
 
+/*** Condenses all user and intermediate ip addresses based on the location to easily display on the map.
+ * params:
+ *      userIps:
+ *          [
+ *              {   address: '111.22.333',
+ *                  latitude: 4.33,
+ *                  longitude: 2.22,
+ *                  asn: 'AS222',
+ *                  isp: 'My isp'
+ *              },
+ *          ]
+ *      intermediateIps:
+ *          [
+ *              {   address: '111.22.333',
+ *                  latitude: 4.33,
+ *                  longitude: 2.22,
+ *                  asn: 'AS222',
+ *                  isp: 'My isp'
+ *              },
+ *          ]
+ *
+ *
+ *  returns:
+ *
+ * [
+ *   {
+ *       latitude: 44.2,
+ *       longitude: 2.3,
+ *       label: "ISPs: My ISP1, My ISP2",
+ *       type: "USER"
+ *    },
+ *    {
+ *       latitude: 45.2,
+ *       longitude: 2.33,
+ *       label: "ISPs: My ISP1, My ISP2",
+ *       type: "INTERMEDIATE"
+ *    },
+ *  ]
+ *
+ * ***/
 function consdenseIPData(userIps, intermediateIps){
+
+    /* transform to obj with lat/lon keys:
+    {
+        44.22: {
+            2.3 {
+                "My Isp": true   // collect all ISPs we have found for ips with this lat/lon
+            }
+        },
+        43.22: {
+            2.3334 // we were unable to recuperate any ISPs for ips with this lat/lon
+        }
+    */
     let userIpsReformatted = {};
     userIps.map((ip) => {
         if (!userIpsReformatted[ip.latitude]) userIpsReformatted[ip.latitude] = {};
@@ -45,6 +116,27 @@ function consdenseIPData(userIps, intermediateIps){
         if (ip.isp) intermediateIpsReformatted[ip.latitude][ip.longitude][ip.isp] = true;
     })
 
+    /*
+    * Create the response object by, for all user and then for all intermediate IPs, creating a data point for each
+    * lat/lon combination corresponding to one or more IPs, noting whether they are user or intermediate ips, and
+    * concatening the ISPs for these IPs into a label for the map marker
+    *
+    * [
+    *   {
+    *       latitude: 44.2,
+    *       longitude: 2.3,
+    *       label: "ISPs: My ISP1, My ISP2",
+    *       type: "USER"
+    *    },
+    *    {
+    *       latitude: 45.2,
+    *       longitude: 2.33,
+    *       label: "ISPs: My ISP1, My ISP2",
+    *       type: "INTERMEDIATE"
+    *    },
+    *  ]
+    *
+    * */
     let allIps = [];
     Object.keys(userIpsReformatted).map((lat) => {
         Object.keys(userIpsReformatted[lat]).map((lon) => {
@@ -77,7 +169,62 @@ function consdenseIPData(userIps, intermediateIps){
 
 }
 
+/***
+ *  Condense traceroute info for the map
+ *  param: traceroutes: results from neo4j query getAllPingData (this is callbackSuccess)
+ *      [
+ *          {
+ *              src : {
+ *                  properties : {
+ *                      latitude: 44.3,
+ *                      longitude: 2.4,
+ *                      ...
+ *                  }
+ *              },
+ *              target: {
+ *                  properties : {
+ *                      latitude: 44.3,
+ *                      longitude: 2.4,
+ *                      ...
+ *                  }
+ *              }
+ *          }
+ *      ]
+ *
+ *
+ *  Returns:
+ *  [
+ {
+            src: {
+                latitude: 44.4,
+                longitude: 2.3
+            }
+            target: {
+                latitude: 45.3,
+                longitude: 2.4
+            },
+            frequency: 0.03
+         },
+ ...
+ ]
+ *
+ * ***/
 function condenseTracerouteData(traceroutes){
+
+    /* Convert to obj with lat/lon key/value pair structure:
+    * {
+    *   src1_latitude: {
+    *       src1_longitude: {
+    *           target1_latitude: {
+    *               target1_longitude : <number of times we saw a hop from (src1_latitude, src1_longitude) to (target1_latitude, target1_longitude)>
+    *           },
+    *           ....
+    *       },
+    *       ...
+    *   },
+    *   ...
+    * }
+    * */
     let traceroutesObj = {}
     traceroutes.map((tr) => {
         let src = tr.src.properties;
@@ -90,6 +237,25 @@ function condenseTracerouteData(traceroutes){
     })
     let traceroutesCondensed=[]
 
+    /* Create a data point for each (src_lat, src_lon), (target_lat, target_lon) combination,
+    and add the relative frequecy that this path was taken compared to others.
+
+    [
+        {
+            src: {
+                latitude: 44.4,
+                longitude: 2.3
+            }
+            target: {
+                latitude: 45.3,
+                longitude: 2.4
+            },
+            frequency: 0.03
+         },
+         ...
+     ]
+
+    */
     Object.keys(traceroutesObj).map((srcLat) => {
         Object.keys(traceroutesObj[srcLat]).map((srcLon) => {
             Object.keys(traceroutesObj[srcLat][srcLon]).map((tarLat) => {
@@ -107,6 +273,8 @@ function condenseTracerouteData(traceroutes){
                         },
                         frequency: freqRelative
                     }
+
+                    // Do not include instances where src and target are the same location
                     if (!((srcLat === tarLat) && (srcLon === tarLon))) {
                         traceroutesCondensed.push(dataPoint)
                     }
@@ -117,7 +285,4 @@ function condenseTracerouteData(traceroutes){
     return traceroutesCondensed;
 
 }
-// var fs = require('fs');
-// var txt = fs.readFileSync('test2.txt').toString()
-// console.log(JSON.stringify(parseTxt(txt)))
 module.exports = {parseTxt, consdenseIPData, condenseTracerouteData};
