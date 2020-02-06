@@ -193,6 +193,25 @@ app.get('/ip/all/address_only', async function (request, response) {
     }
 })
 
+/***
+ * Gets all the user ip addresses without extra info. Used by the windows bat file to fetch the ips to traceroute.
+ *
+ * response body:
+ *  [123.45.678, 910.11.121, 314.15.161]
+ *
+ * ***/
+app.get('/ip/all/address_only/windows', async function (request, response) {
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    try {
+        let allIpInfo = await getAllUserIpData();
+        let justAddresses = allIpInfo.map((ip) => {return ip.address})
+        return response.status(200).send(justAddresses);
+    } catch (err) {
+        return response.status(500).end();
+    }
+})
+
 app.listen(process.env.PORT || 5000, () =>{})
 
 
