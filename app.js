@@ -78,16 +78,21 @@ app.get('/traceroutes/all/condensed', async function (request, response) {
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let callbackSuccess = (res) => {
-            let traceroutes = JSON.parse(res)
+            let traceroutes = JSON.parse(res);
+            console.log("traceroutes fetched")
             let traceroutesCondensed = condenseTracerouteData(traceroutes);
+            console.log("traceroutes condensed")
             return response.status(200).send(traceroutesCondensed)
         };
         let callbackErr = (err) => {
+            console.log(err)
             return response.status(500).end();
         };
+        console.log("start")
         getAllPingData(callbackSuccess, callbackErr)
 
     } catch (err) {
+        console.log(err)
         return response.status(500).end();
     }
 })
