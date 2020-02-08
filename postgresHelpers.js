@@ -228,7 +228,7 @@ const fetch = require("node-fetch")
 
 async function addCountry(){
     let userData = await getAllUserIpData();
-    let intermediateData = await getAllIntermediateIpData();
+    // let intermediateData = await getAllIntermediateIpData();
     // let ip = {address: "test", country_code: null, latitude: 11.10, longitude: 22.0}
     let ip;
 
@@ -240,25 +240,25 @@ async function addCountry(){
         let location = await response.json();
         let ipC = ip;
         ipC.country_code = location.countryCode;
-        console.log(location, ipC)
+        console.log("LLL", location, ipC)
         let values = [ipC.country_code, ipC.address];
         let qr = 'UPDATE IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
         let res = await client.query(qr, values)
     }
-
-    for (ip in intermediateData){
-        const response = await fetch("http://api.geonames.org/countryCodeJSON?lat=" + ip.latitude.toString() + "&lng="+ip.longitude.toString()+"&username=pingpong", {
-            method: 'GET',
-            headers: {'Content-Type': 'application/json'}
-        });
-        let location = await response.json();
-        let ipC = ip;
-        ipC.country_code = location.countryCode;
-        console.log(location, ipC)
-        let values = [ipC.country_code, ipC.address];
-        let qr = 'UPDATE INTERMEDIATE_IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
-        let res = await client.query(qr, values)
-    }
+    //
+    // for (ip in intermediateData){
+    //     const response = await fetch("http://api.geonames.org/countryCodeJSON?lat=" + ip.latitude.toString() + "&lng="+ip.longitude.toString()+"&username=pingpong", {
+    //         method: 'GET',
+    //         headers: {'Content-Type': 'application/json'}
+    //     });
+    //     let location = await response.json();
+    //     let ipC = ip;
+    //     ipC.country_code = location.countryCode;
+    //     console.log(location, ipC)
+    //     let values = [ipC.country_code, ipC.address];
+    //     let qr = 'UPDATE INTERMEDIATE_IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
+    //     let res = await client.query(qr, values)
+    // }
 
 
 
