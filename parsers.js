@@ -210,7 +210,20 @@ function consdenseIPData(userIps, intermediateIps){
  *
  * ***/
 function condenseTracerouteData(traceroutes){
+    let traceroutes_filtered = traceroutes.filter((tr) => {
+        let valid = true;
+        let src = tr.src.properties;
 
+        //do not include weird usa locations
+        valid = valid && (src.country_code !== "US");
+        let target = tr.target.properties;
+        valid = valid && (target.country_code !== "US");
+        // Do not include instances where src and target are the same location
+        valid = valid && !((src.latitude === target.latitude)
+            && (src.longitude === target.longitude));
+
+        return valid;
+    });
     /* Convert to obj with lat/lon key/value pair structure:
     * {
     *   src1_latitude: {
@@ -226,7 +239,7 @@ function condenseTracerouteData(traceroutes){
     * }
     * */
     let traceroutesObj = {}
-    traceroutes.map((tr) => {
+    traceroutes_filtered.map((tr) => {
         let src = tr.src.properties;
         let target = tr.target.properties;
         if (!traceroutesObj[src.latitude]) traceroutesObj[src.latitude] = {};
