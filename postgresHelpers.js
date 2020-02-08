@@ -238,9 +238,10 @@ async function addCountry(){
             headers: {'Content-Type': 'application/json'}
         });
         let location = await response.json();
-        ip.country_code = location.countryCode;
-        console.log(ip)
-        let values = [ip.country_code, ip.address];
+        let ipC = ip;
+        ipC.country_code = location.countryCode;
+        console.log(ipC)
+        let values = [ipC.country_code, ipC.address];
         let qr = 'UPDATE IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
         let res = await client.query(qr, values)
     }
@@ -251,9 +252,10 @@ async function addCountry(){
             headers: {'Content-Type': 'application/json'}
         });
         let location = await response.json();
-        ip.country_code = location.countryCode;
-        console.log(ip)
-        let values = [ip.country_code, ip.address];
+        let ipC = ip;
+        ipC.country_code = location.countryCode;
+        console.log(ipC)
+        let values = [ipC.country_code, ipC.address];
         let qr = 'UPDATE INTERMEDIATE_IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
         let res = await client.query(qr, values)
     }
