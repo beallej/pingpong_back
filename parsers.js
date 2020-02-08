@@ -110,11 +110,13 @@ function consdenseIPData(userIps, intermediateIps){
     })
 
     let intermediateIpsReformatted = {};
+    intermediateIps = intermediateIps.filter((ip) => {return (ip.country_code !== "US")})
     intermediateIps.map((ip) => {
         if (!intermediateIpsReformatted[ip.latitude]) intermediateIpsReformatted[ip.latitude] = {};
         if (!intermediateIpsReformatted[ip.latitude][ip.longitude]) intermediateIpsReformatted[ip.latitude][ip.longitude] = {}
         if (ip.isp) intermediateIpsReformatted[ip.latitude][ip.longitude][ip.isp] = true;
-    })
+    });
+
 
     /*
     * Create the response object by, for all user and then for all intermediate IPs, creating a data point for each
