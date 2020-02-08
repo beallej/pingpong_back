@@ -234,6 +234,7 @@ async function addCountry(){
 
     try {
         for (ip in userData) {
+            console.log(ip)
             const response = await fetch("http://api.geonames.org/countryCodeJSON?lat=" + ip.latitude.toString() + "&lng=" + ip.longitude.toString() + "&username=pingpong", {
                 method: 'GET',
                 headers: {'Content-Type': 'application/json'}
