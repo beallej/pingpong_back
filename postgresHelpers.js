@@ -233,7 +233,7 @@ async function addCountry(){
     let ip;
 
     try {
-        for (ip in userData) {
+        userData.map(async (ip) => {
             console.log(ip)
             const response = await fetch("http://api.geonames.org/countryCodeJSON?lat=" + ip.latitude.toString() + "&lng=" + ip.longitude.toString() + "&username=pingpong", {
                 method: 'GET',
@@ -246,7 +246,7 @@ async function addCountry(){
             let values = [ipC.country_code, ipC.address];
             let qr = 'UPDATE IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
             let res = await client.query(qr, values)
-        }
+        });
     } catch (e) {
         console.log(e)
     }
