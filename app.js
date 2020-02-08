@@ -1,5 +1,5 @@
 const {IP_TYPES} = require("./constants.js");
-const {addTraceroutesToDb, getAllPingData, addCountry} = require("./neo4jhelpers.js");
+const {addTraceroutesToDb, getAllPingData} = require("./neo4jhelpers.js");
 const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
 const {parseTxt, consdenseIPData, condenseTracerouteData} = require("./parsers");
 const express = require('express')
@@ -214,17 +214,6 @@ app.get('/ip/all/address_only/windows', async function (request, response) {
         let allIpInfo = await getAllUserIpData();
         let justAddresses = allIpInfo.map((ip) => {return ip.address})
         return response.status(200).send(justAddresses);
-    } catch (err) {
-        return response.status(500).end();
-    }
-})
-
-app.get('/addCountry', async function (request, response) {
-    response.header("Access-Control-Allow-Origin", "*");
-    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    try {
-        await addCountry();
-        return response.status(200).send();
     } catch (err) {
         return response.status(500).end();
     }
