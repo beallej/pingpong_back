@@ -1,5 +1,6 @@
 var neo4j = require('neo4j');
 var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
+const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
 
 /*** Gets all traceroute data from db.
  * params:
@@ -159,4 +160,43 @@ function fixData(address, lat, lon, isp, asn, country_code){
         }
     });
 }
-module.exports = {addTraceroutesToDb, getAllPingData};
+
+async function addCountry(){
+    let allUser = await getAllUserIpData();
+    let allInter = await getAllIntermediateIpData();
+    allUser.map((ip)=> {
+        let query = "MATCH (n { address: '" + ip.address + "'})\n" +
+            "SET n.country_code = '" + ip.country_code + "'\n"+
+            "RETURN n.address, n.latitude, n.longitude, n.asn, n.isp, n.country_code";
+
+        db.cypher({
+            query: query,
+        }, (err, batchResults) => {
+            if (batchResults){
+                console.log("RESULTS - fix data: ", JSON.stringify(batchResults[0]))
+            }
+            if (err){
+                console.log("ERR fix dat: ", err)
+            }
+        });
+    });
+    allInter.map((ip) => {
+        let query = "MATCH (n { address: '" + ip.address + "'})\n" +
+            "SET n.country_code = '" + ip.country_code + "'\n"+
+            "RETURN n.address, n.latitude, n.longitude, n.asn, n.isp, n.country_code";
+
+        db.cypher({
+            query: query,
+        }, (err, batchResults) => {
+            if (batchResults){
+                console.log("RESULTS - fix data: ", JSON.stringify(batchResults[0]))
+            }
+            if (err){
+                console.log("ERR fix dat: ", err)
+            }
+        });
+    })
+
+}
+
+module.exports = {addTraceroutesToDb, getAllPingData, addCountry};

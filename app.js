@@ -1,6 +1,6 @@
 const {IP_TYPES} = require("./constants.js");
-const {addTraceroutesToDb, getAllPingData} = require("./neo4jhelpers.js");
-const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG, addCountry} = require("./postgresHelpers");
+const {addTraceroutesToDb, getAllPingData, addCountry} = require("./neo4jhelpers.js");
+const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
 const {parseTxt, consdenseIPData, condenseTracerouteData} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
@@ -223,7 +223,7 @@ app.get('/addCountry', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
-        let allIpInfo = await addCountry();
+        await addCountry();
         return response.status(200).send();
     } catch (err) {
         return response.status(500).end();
