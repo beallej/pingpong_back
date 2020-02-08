@@ -1,6 +1,6 @@
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb, getAllPingData} = require("./neo4jhelpers.js");
-const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
+const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG, addCountry} = require("./postgresHelpers");
 const {parseTxt, consdenseIPData, condenseTracerouteData} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
@@ -135,6 +135,7 @@ app.get('/ip/all/condensed', async function (request, response) {
  *        longitude: 2.3387,
  *        asn: "AS123",
  *        isp: "ISPs: Renater",
+ *        country_code: "FR"
  *      },
  *  ]
  *
@@ -161,7 +162,8 @@ app.get('/ip/intermediate/all', async function (request, response) {
  *        latitude: 48.8582,
  *        longitude: 2.3387,
  *        asn: "AS123",
- *        isp: "ISPs: Renater"
+ *        isp: "ISPs: Renater",
+ *        country_code: "FR"
  *      },
  *  ]
  *
@@ -212,6 +214,17 @@ app.get('/ip/all/address_only/windows', async function (request, response) {
         let allIpInfo = await getAllUserIpData();
         let justAddresses = allIpInfo.map((ip) => {return ip.address})
         return response.status(200).send(justAddresses);
+    } catch (err) {
+        return response.status(500).end();
+    }
+})
+
+app.get('/addCountry', async function (request, response) {
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    try {
+        let allIpInfo = await addCountry();
+        return response.status(200).send();
     } catch (err) {
         return response.status(500).end();
     }

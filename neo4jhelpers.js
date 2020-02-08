@@ -53,11 +53,13 @@ async function addTraceroutesToDb(routes){
                 query += hop.longitude ? ", longitude: {ipLongitude}" : "";
                 query += hop.asn ? ", asn: {ipAsn}" : "";
                 query += hop.isp ? ", isp: {ipIsp}" : "";
+                query += hop.country_code ? ", country_code: {ipCountryCode}" : "";
                 query += "})";
                 if (hop.address && hop.longitude && hop.latitude){
                     let params = {ipAddress: hop.address, ipLatitude: hop.latitude, longitude: hop.longitude}
                     if (hop.asn) params.ipAsn = hop.asn;
                     if (hop.isp) params.isp = hop.isp;
+                    if (hop.country_code) params.country_code = hop.country_code;
                     nodeQueries.push({
                         query: query,
                         params: {
@@ -65,7 +67,8 @@ async function addTraceroutesToDb(routes){
                             ipLatitude: parseFloat(hop.latitude),
                             ipLongitude: parseFloat(hop.longitude),
                             ipAsn: hop.asn,
-                            ipIsp: hop.isp
+                            ipIsp: hop.isp,
+                            ipCountryCode: hop.country_code
                         },
                         lean: true
                     })
@@ -136,13 +139,14 @@ async function addTraceroutesToDb(routes){
  fixData("222.222.22.222", "48.8602294921875", "2.3410699367523193", "My isp", "AS999")
 
  * ***/
-function fixData(address, lat, lon, isp, asn){
+function fixData(address, lat, lon, isp, asn, country_code){
     let query = "MATCH (n { address: '" + address + "'})\n" +
         "SET n.latitude = " + lat + "\n" +
         "SET n.longitude = " + lon + "\n" +
         "SET n.isp = '" + isp + "'\n"+
         "SET n.asn = '" + asn + "'\n"+
-        "RETURN n.address, n.latitude, n.longitude, n.asn, n.isp";
+        "SET n.country_code = '" + country_code + "'\n"+
+        "RETURN n.address, n.latitude, n.longitude, n.asn, n.isp, n.country_code";
 
     db.cypher({
         query: query,

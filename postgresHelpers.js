@@ -17,12 +17,13 @@ client.connect();
  *  longitude: longitude,
  *  asn: asn,
  *  isp: isp,
+ *  country_code: "FR"
  *  type: <"USER" / "INTERMEDIATE">
  *
  *  Returns the created entry, or null if already in db, or null if error
  * ***/
-async function saveToDb(ip, latitude, longitude, asn, isp, type) {
-    const values = [ip, latitude, longitude, asn, isp]
+async function saveToDb(ip, latitude, longitude, asn, isp, country_code, type) {
+    const values = [ip, latitude, longitude, asn, isp, country_code]
     try {
         let existingEntry = await getInfoForIpFromDb(ip, type)
         if (existingEntry) {
@@ -103,7 +104,7 @@ async function insertUserIpWithLocation(ip) {
             response.statusCode = 400;
             response.statusMessage = "Ip not located in France, located in " + location.country_code;
         } else {
-            dbRes = await saveToDb(ip, location.latitude, location.longitude, location.asn, location.isp, type);
+            dbRes = await saveToDb(ip, location.latitude, location.longitude, location.asn, location.isp, location.country_code, type);
             response.statusCode = 201;
             response.statusMessage = "Ip address successfully added!"
         }
@@ -166,7 +167,7 @@ async function addOneTracerouteToIpList(route){
     intermediateIPsFiltered = Object.values(intermediateIPsFiltered)
 
     return Promise.all(intermediateIPsFiltered.map((ip) => {
-        return saveToDb(ip.address, ip.latitude, ip.longitude, ip.asn, ip.isp, IP_TYPES.INTERMEDIATE)
+        return saveToDb(ip.address, ip.latitude, ip.longitude, ip.asn, ip.isp, ip.country_code, IP_TYPES.INTERMEDIATE)
     }))
 }
 
@@ -223,5 +224,25 @@ async function getOneTracerouteLocationInfo(src, tr){
 }
 
 
-module.exports = {getInfoForIp: getInfoForIpFromDb,
+const fetch = require("node-fetch")
+
+async function addCountry(){
+    // let userData = await getAllUserIpData();
+    // let intermediateData = await getAllIntermediateIpData();
+    let ip = {address: "test", country_code: null, latitude: 11.10, longitude: 22.0}
+
+    const response = await fetch("http://api.geonames.org/countryCodeJSON?lat=" + ip.latitude + "&lng="+ip.longitude+"&username=pingpong", {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
+    });
+    let location = await response.json();
+    ip.country_code = location.countryCode;
+    let values = [ip.country_code, ip.address];
+    let qr = 'UPDATE INTERMEDIATE_IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
+    let res = await client.query(qr, values)
+
+}
+
+
+module.exports = {addCountry, getInfoForIp: getInfoForIpFromDb,
     getTracerouteLocationInfo: getTraceroutesLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG: addTraceroutesToIpList};
