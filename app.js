@@ -78,7 +78,7 @@ app.get('/traceroutes/all/condensed', async function (request, response) {
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let callbackSuccess = (res) => {
-            let traceroutes = JSON.parse(res);
+            let traceroutes = res;
             console.log("traceroutes fetched")
             let traceroutesCondensed = condenseTracerouteData(traceroutes);
             console.log("traceroutes condensed")

@@ -11,7 +11,7 @@ async function getAllPingData(callbackSuccess, callbackErr){
         query: "MATCH (src)-[r:PINGS]-(target) RETURN src,target"
     }, (err, res) => {
         if (res){
-            callbackSuccess(JSON.stringify(res));
+            callbackSuccess(res);
         }
         if (err){
             callbackErr(err)
