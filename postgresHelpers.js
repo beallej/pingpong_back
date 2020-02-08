@@ -240,7 +240,7 @@ async function addCountry(){
         let location = await response.json();
         let ipC = ip;
         ipC.country_code = location.countryCode;
-        console.log(ipC)
+        console.log(location, ipC)
         let values = [ipC.country_code, ipC.address];
         let qr = 'UPDATE IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
         let res = await client.query(qr, values)
@@ -254,7 +254,7 @@ async function addCountry(){
         let location = await response.json();
         let ipC = ip;
         ipC.country_code = location.countryCode;
-        console.log(ipC)
+        console.log(location, ipC)
         let values = [ipC.country_code, ipC.address];
         let qr = 'UPDATE INTERMEDIATE_IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
         let res = await client.query(qr, values)
