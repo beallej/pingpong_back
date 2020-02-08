@@ -227,19 +227,36 @@ async function getOneTracerouteLocationInfo(src, tr){
 const fetch = require("node-fetch")
 
 async function addCountry(){
-    // let userData = await getAllUserIpData();
-    // let intermediateData = await getAllIntermediateIpData();
-    let ip = {address: "test", country_code: null, latitude: 11.10, longitude: 22.0}
+    let userData = await getAllUserIpData();
+    let intermediateData = await getAllIntermediateIpData();
+    // let ip = {address: "test", country_code: null, latitude: 11.10, longitude: 22.0}
+    let ip;
 
-    const response = await fetch("http://api.geonames.org/countryCodeJSON?lat=" + ip.latitude + "&lng="+ip.longitude+"&username=pingpong", {
-        method: 'GET',
-        headers: {'Content-Type': 'application/json'}
-    });
-    let location = await response.json();
-    ip.country_code = location.countryCode;
-    let values = [ip.country_code, ip.address];
-    let qr = 'UPDATE IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
-    let res = await client.query(qr, values)
+    for (ip in userData){
+        const response = await fetch("http://api.geonames.org/countryCodeJSON?lat=" + ip.latitude + "&lng="+ip.longitude+"&username=pingpong", {
+            method: 'GET',
+            headers: {'Content-Type': 'application/json'}
+        });
+        let location = await response.json();
+        ip.country_code = location.countryCode;
+        let values = [ip.country_code, ip.address];
+        let qr = 'UPDATE IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
+        let res = await client.query(qr, values)
+    }
+
+    for (ip in intermediateData){
+        const response = await fetch("http://api.geonames.org/countryCodeJSON?lat=" + ip.latitude + "&lng="+ip.longitude+"&username=pingpong", {
+            method: 'GET',
+            headers: {'Content-Type': 'application/json'}
+        });
+        let location = await response.json();
+        ip.country_code = location.countryCode;
+        let values = [ip.country_code, ip.address];
+        let qr = 'UPDATE IP_INFO SET COUNTRY_CODE = $1 WHERE ADDRESS = $2';
+        let res = await client.query(qr, values)
+    }
+
+
 
 }
 
