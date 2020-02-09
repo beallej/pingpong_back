@@ -104,7 +104,7 @@ async function insertUserIpWithLocation(ip) {
             response.statusCode = 400;
             response.statusMessage = "Ip not located in France, located in " + location.country_code;
         } else {
-            dbRes = await saveToDb(ip, location.latitude, location.longitude, location.asn, location.isp, location.country_code, type);
+            dbRes = await saveToDb(ip, location.latitude, location.longitude, location.asn, location.isp, location.country_code, IP_TYPES.USER);
             response.statusCode = 201;
             response.statusMessage = "Ip address successfully added!"
         }
