@@ -53,7 +53,7 @@ function parseTxtBatch(txtRaw){
     let txt = txtRaw.replace(/\n|\r/g,'');
 
     //parse src ip
-    let srcRegEx = /__SRC__(.*)__END_SRC__/;
+    let srcRegEx = /_SRC_(.*)_END_SRC_/;
     let srcMatches = srcRegEx.exec(txt);
     let src = srcMatches[1].trim();
     console.log("SRC: ", srcMatches);
@@ -66,7 +66,7 @@ function parseTxtBatch(txtRaw){
 
     //parse traceroutes
     let result;
-    let trRegEx = /__BEGIN_([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})_TRACEROUTE__(.*)__END_(\1)_TRACEROUTE__/g;
+    let trRegEx = /_BEGIN_([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})_TRACEROUTE_(.*)_END_(\1)_TRACEROUTE_/g;
 
 
     //for each traceroute
@@ -400,7 +400,7 @@ function condenseTracerouteData(traceroutes){
     return traceroutesCondensed;
 
 }
-module.exports = {parseTxt, consdenseIPData, condenseTracerouteData, parseTxtBatch: parseTxtBatch2};
+module.exports = {parseTxt, consdenseIPData, condenseTracerouteData, parseTxtBatch: parseTxtBatch};
 // var fs = require("fs");
-// var text = fs.readFileSync("./pingpong2.txt", "utf-8");
-// console.log(JSON.stringify(parseTxtBatch2(text)))
+// var text = fs.readFileSync("./pingpong.txt", "utf-8");
+// console.log(JSON.stringify(parseTxtBatch(text)))
