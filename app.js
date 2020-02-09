@@ -1,7 +1,7 @@
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb, getAllPingData} = require("./neo4jhelpers.js");
 const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
-const {parseTxt, consdenseIPData, condenseTracerouteData} = require("./parsers");
+const {parseTxt, parseTxtBatch, consdenseIPData, condenseTracerouteData} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
 
@@ -18,13 +18,8 @@ app.post('/traceroute',async function(request, response){
         let body = Object.keys(request.body)[0];
         const traceroutesParsed = parseTxt(body);
 
-        console.log("TRACEROUTES", JSON.stringify(traceroutesParsed))
-        await insertUserIpWithLocation(traceroutesParsed.src);
-        let routes = await getTracerouteLocationInfo(traceroutesParsed.src, traceroutesParsed.traceroutes);
-        let ipListRes = await addTraceroutesToIpListPG(routes);
+        await handleTraceRouteData(traceroutesParsed);
 
-        console.log("ROUTES WITH LOCATION INFP", routes)
-        let createResult = await addTraceroutesToDb(routes);
         response.header("Access-Control-Allow-Origin", "*");
         response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         response.statusCode = 200;
@@ -34,17 +29,37 @@ app.post('/traceroute',async function(request, response){
         return response.status(500).end();
     }
 });
+
+/*** Add information from execution of script to gather traceroutes.
+ *  Body is sent as txt file ***/
 app.post('/traceroute/windows',async function(request, response){
     try {
         let body = Object.keys(request.body)[0];
         console.log("BODY", body);
-        return response.status(200).end()
+        let data = parseTxtBatch(body);
+        await handleTraceRouteData(data)
+        response.header("Access-Control-Allow-Origin", "*");
+        response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        response.statusCode = 200;
+        response.statusMessage = "Traceroutes successsfully added";
+        return response.end()
     } catch(e){
         return response.status(500).end()
     }
 
 
 })
+
+async function handleTraceRouteData(traceroutesParsed){
+
+    console.log("TRACEROUTES", JSON.stringify(traceroutesParsed))
+    await insertUserIpWithLocation(traceroutesParsed.src);
+    let routes = await getTracerouteLocationInfo(traceroutesParsed.src, traceroutesParsed.traceroutes);
+    let ipListRes = await addTraceroutesToIpListPG(routes);
+
+    console.log("ROUTES WITH LOCATION INFP", routes)
+    let createResult = await addTraceroutesToDb(routes);
+}
 
 
 /*** ADD A USER IP ADDRESS

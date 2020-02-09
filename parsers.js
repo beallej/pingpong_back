@@ -3,7 +3,6 @@
  * params: txtRaw: the traceroute info as a string
  * ***/
 function parseTxt(txtRaw){
-
     //remove new line chars (if they exist, different for different OS)
     let txt = txtRaw.replace(/\n|\r/g,'');
 
@@ -47,6 +46,107 @@ function parseTxt(txtRaw){
         resJSON.traceroutes.push(trObj)
     }
     return resJSON;
+}
+
+function parseTxtBatch(txtRaw){
+    //remove new line chars (if they exist, different for different OS)
+    let txt = txtRaw.replace(/\n|\r/g,'');
+
+    //parse src ip
+    let srcRegEx = /__SRC__(.*)__END_SRC__/;
+    let srcMatches = srcRegEx.exec(txt);
+    let src = srcMatches[1].trim();
+    console.log("SRC: ", srcMatches);
+
+    //set up response obj
+    let resJSON = {}
+    resJSON["src"] = src;
+    resJSON["traceroutes"] = [];
+
+
+    //parse traceroutes
+    let result;
+    let trRegEx = /__BEGIN_([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})_TRACEROUTE__(.*)__END_(\1)_TRACEROUTE__/g;
+
+
+    //for each traceroute
+    while (result = trRegEx.exec(txt)) {
+
+        //tr is one traceroute as a raw string
+        let tr = result[2];
+
+        // //parse dst from traceroute
+        // let dstRegEx =  /__DST__(.*)__END_DST__/;
+        // let dstRes = dstRegEx.exec(tr);
+        // let dst = dstRes[1].trim();
+        let dst = result[1];
+
+        //parse traceroute body
+        let trObj = {dst: dst, route: []};
+        let regExAddress = /  ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})/g;
+        let addressResult;
+
+        //parse out addresses found
+        while(addressResult = regExAddress.exec(tr)) {
+            console.log(addressResult)
+            trObj.route.push(addressResult[1])
+        }
+        resJSON.traceroutes.push(trObj)
+    }
+    return resJSON;
+
+
+
+}
+
+function parseTxtBatch2(txtRaw){
+    //remove new line chars (if they exist, different for different OS)
+    let txt = txtRaw.replace(/\n|\r/g,'');
+
+    //parse src ip
+    let srcRegEx = /_SRC_(.*)_END_SRC_/;
+    let srcMatches = srcRegEx.exec(txt);
+    let src = srcMatches[1].trim();
+    console.log("SRC: ", srcMatches);
+
+    //set up response obj
+    let resJSON = {}
+    resJSON["src"] = src;
+    resJSON["traceroutes"] = [];
+
+
+    //parse traceroutes
+    let result;
+    let trRegEx = /termination(.*?)raire d/g;
+
+
+    //for each traceroute
+    while (result = trRegEx.exec(txt)) {
+
+        //tr is one traceroute as a raw string
+        let tr = result[1];
+
+        //parse dst from traceroute
+        let dstRegEx =  /ers (.*)avec/;
+        let dstRes = dstRegEx.exec(tr);
+        let dst = dstRes[1].trim();
+
+        //parse traceroute body
+        let trObj = {dst: dst, route: []};
+        let regExAddress = /  ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})/g;
+        let addressResult;
+
+        //parse out addresses found
+        while(addressResult = regExAddress.exec(tr)) {
+            console.log(addressResult)
+            trObj.route.push(addressResult[1])
+        }
+        resJSON.traceroutes.push(trObj)
+    }
+    return resJSON;
+
+
+
 }
 
 /*** Condenses all user and intermediate ip addresses based on the location to easily display on the map.
@@ -300,4 +400,7 @@ function condenseTracerouteData(traceroutes){
     return traceroutesCondensed;
 
 }
-module.exports = {parseTxt, consdenseIPData, condenseTracerouteData};
+module.exports = {parseTxt, consdenseIPData, condenseTracerouteData, parseTxtBatch: parseTxtBatch2};
+// var fs = require("fs");
+// var text = fs.readFileSync("./pingpong2.txt", "utf-8");
+// console.log(JSON.stringify(parseTxtBatch2(text)))
