@@ -44,6 +44,7 @@ app.post('/traceroute/windows',async function(request, response){
         response.statusMessage = "Traceroutes successsfully added";
         return response.end()
     } catch(e){
+        console.log("ERROR ADDING TRACEROUTES", e)
         return response.status(500).end()
     }
 
@@ -57,7 +58,7 @@ async function handleTraceRouteData(traceroutesParsed){
     let routes = await getTracerouteLocationInfo(traceroutesParsed.src, traceroutesParsed.traceroutes);
     let ipListRes = await addTraceroutesToIpListPG(routes);
 
-    console.log("ROUTES WITH LOCATION INFP", routes)
+    console.log("ROUTES WITH LOCATION INFO", routes)
     let createResult = await addTraceroutesToDb(routes);
 }
 
