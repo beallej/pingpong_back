@@ -34,6 +34,18 @@ app.post('/traceroute',async function(request, response){
         return response.status(500).end();
     }
 });
+app.post('/traceroute/windows',async function(request, response){
+    try {
+        let body = Object.keys(request.body)[0];
+        console.log("BODY", body);
+        return response.status(200).end()
+    } catch(e){
+        return response.status(500).end()
+    }
+
+
+}
+
 
 /*** ADD A USER IP ADDRESS
  *
