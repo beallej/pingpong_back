@@ -219,6 +219,17 @@ app.get('/ip/all/address_only/windows', async function (request, response) {
     }
 })
 
+app.get('/ip/count', async function (request, response) {
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    try {
+        let allIpInfo = await getAllUserIpData();
+        return response.status(200).send(allIpInfo.length);
+    } catch (err) {
+        return response.status(500).end();
+    }
+})
+
 app.listen(process.env.PORT || 5000, () =>{})
 
 
