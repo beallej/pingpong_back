@@ -210,7 +210,7 @@ function consdenseIPData(userIps, intermediateIps){
     })
 
     let intermediateIpsReformatted = {};
-    intermediateIps = intermediateIps.filter((ip) => {return (ip.country_code !== "US")})
+    intermediateIps = intermediateIps.filter((ip) => {return ((ip.country_code === "FR") || (ip.country_code === "CH"))})
     intermediateIps.map((ip) => {
         if (!intermediateIpsReformatted[ip.latitude]) intermediateIpsReformatted[ip.latitude] = {};
         if (!intermediateIpsReformatted[ip.latitude][ip.longitude]) intermediateIpsReformatted[ip.latitude][ip.longitude] = {}
