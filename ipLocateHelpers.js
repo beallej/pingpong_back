@@ -3,7 +3,7 @@ const fetch = require("node-fetch")
 
 /*** Gets the location data (lat, lon, isp, asn) for a given ip address, using multiple apis incase one fails. ***/
 async function getLocationMultipleAPIs(ip) {
-    let apis =[getLocationIpLocate, getLocationIpStack, getLocationIPGeolocation, getLocationIP2Location, getLocationIpApi, getLocationIpDashApi, getLocationIPInfo];
+    let apis =[getLocationIpLocate, getLocationIpStack, getLocationIP2Location, getLocationIpApi, getLocationIpDashApi, getLocationIPInfo];
     let i = 0;
     let location = {};  //final object
     let _location;      //temporary obect to hold response from api
