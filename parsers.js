@@ -318,10 +318,10 @@ function condenseTracerouteData(traceroutes){
         let valid = true;
         let src = tr.src.properties;
 
-        //do not include weird usa locations
-        valid = valid && (src.country_code !== "US");
+        //do not include weird locations
+        valid = valid && ((src.country_code === "FR") || (src.country_code === "CH"));
         let target = tr.target.properties;
-        valid = valid && (target.country_code !== "US");
+        valid = valid && ((target.country_code === "FR") || (target.country_code === "CH"));
         // Do not include instances where src and target are the same location
         valid = valid && !((src.latitude === target.latitude)
             && (src.longitude === target.longitude));
