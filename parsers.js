@@ -348,18 +348,18 @@ function condenseTracerouteData(traceroutes){
     *   ...
     * }
     * */
-    let traceroutesObj = {}
-    traceroutes_filtered.map((tr) => {
-        let traceroute_instance = tr.tr.properties;
-        let src = tr.src.properties;
-        let target = tr.target.properties;
-        if (!traceroutesObj[src.latitude]) traceroutesObj[src.latitude] = {};
-        if (!traceroutesObj[src.latitude][src.longitude]) traceroutesObj[src.latitude][src.longitude] = {};
-        if (!traceroutesObj[src.latitude][src.longitude][target.latitude]) traceroutesObj[src.latitude][src.longitude][target.latitude] = {};
-        if (!traceroutesObj[src.latitude][src.longitude][target.latitude][target.longitude]) traceroutesObj[src.latitude][src.longitude][target.latitude][target.longitude] = 0;
-        traceroutesObj[src.latitude][src.longitude][target.latitude][target.longitude] += 1;
-    })
-    let traceroutesCondensed=[]
+    // let traceroutesObj = {}
+    // traceroutes_filtered.map((tr) => {
+    //     let traceroute_instance = tr.tr.properties;
+    //     let src = tr.src.properties;
+    //     let target = tr.target.properties;
+    //     if (!traceroutesObj[src.latitude]) traceroutesObj[src.latitude] = {};
+    //     if (!traceroutesObj[src.latitude][src.longitude]) traceroutesObj[src.latitude][src.longitude] = {};
+    //     if (!traceroutesObj[src.latitude][src.longitude][target.latitude]) traceroutesObj[src.latitude][src.longitude][target.latitude] = {};
+    //     if (!traceroutesObj[src.latitude][src.longitude][target.latitude][target.longitude]) traceroutesObj[src.latitude][src.longitude][target.latitude][target.longitude] = 0;
+    //     traceroutesObj[src.latitude][src.longitude][target.latitude][target.longitude] += 1;
+    // })
+    // let traceroutesCondensed=[]
 
     /* Create a data point for each (src_lat, src_lon), (target_lat, target_lon) combination,
     and add the relative frequecy that this path was taken compared to others.
