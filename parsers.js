@@ -327,6 +327,13 @@ function condenseTracerouteData(traceroutes){
 
         return valid;
     });
+    traceroutes_filtered = traceroutes_filtered.map((tr) => {
+        return {
+            src: tr.src.properties,
+            target: tr.target.properties,
+            tr: tr.tr.properties
+        }
+    });
     /* Convert to obj with lat/lon key/value pair structure:
     * {
     *   src1_latitude: {
@@ -343,6 +350,7 @@ function condenseTracerouteData(traceroutes){
     * */
     let traceroutesObj = {}
     traceroutes_filtered.map((tr) => {
+        let traceroute_instance = tr.tr.properties;
         let src = tr.src.properties;
         let target = tr.target.properties;
         if (!traceroutesObj[src.latitude]) traceroutesObj[src.latitude] = {};
@@ -398,7 +406,8 @@ function condenseTracerouteData(traceroutes){
             })
         })
     })
-    return traceroutesCondensed;
+    // return traceroutesCondensed;
+    return traceroutes_filtered;
 
 }
 module.exports = {parseTxt, consdenseIPData, condenseTracerouteData, parseTxtBatch: parseTxtBatch};

@@ -8,7 +8,7 @@ var db = new neo4j.GraphDatabase(process.env['GRAPHENEDB_URL']);
  * ***/
 async function getAllPingData(callbackSuccess, callbackErr){
     await db.cypher({
-        query: "MATCH (src)-[r:PINGS]-(target) RETURN src,target"
+        query: "MATCH (src)-[tr:PINGS]-(target) RETURN src,target,tr"
     }, (err, res) => {
         if (res){
             callbackSuccess(res);
