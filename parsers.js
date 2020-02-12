@@ -380,32 +380,32 @@ function condenseTracerouteData(traceroutes){
      ]
 
     */
-    Object.keys(traceroutesObj).map((srcLat) => {
-        Object.keys(traceroutesObj[srcLat]).map((srcLon) => {
-            Object.keys(traceroutesObj[srcLat][srcLon]).map((tarLat) => {
-                Object.keys(traceroutesObj[srcLat][srcLon][tarLat]).map((tarLon) => {
-                    let freqRaw = traceroutesObj[srcLat][srcLon][tarLat][tarLon];
-                    let freqRelative = freqRaw/traceroutes.length;
-                    let dataPoint = {
-                        src: {
-                            latitude: srcLat,
-                            longitude: srcLon
-                        },
-                        target: {
-                            latitude: tarLat,
-                            longitude: tarLon
-                        },
-                        frequency: freqRelative
-                    }
-
-                    // Do not include instances where src and target are the same location
-                    if (!((srcLat === tarLat) && (srcLon === tarLon))) {
-                        traceroutesCondensed.push(dataPoint)
-                    }
-                })
-            })
-        })
-    })
+    // Object.keys(traceroutesObj).map((srcLat) => {
+    //     Object.keys(traceroutesObj[srcLat]).map((srcLon) => {
+    //         Object.keys(traceroutesObj[srcLat][srcLon]).map((tarLat) => {
+    //             Object.keys(traceroutesObj[srcLat][srcLon][tarLat]).map((tarLon) => {
+    //                 let freqRaw = traceroutesObj[srcLat][srcLon][tarLat][tarLon];
+    //                 let freqRelative = freqRaw/traceroutes.length;
+    //                 let dataPoint = {
+    //                     src: {
+    //                         latitude: srcLat,
+    //                         longitude: srcLon
+    //                     },
+    //                     target: {
+    //                         latitude: tarLat,
+    //                         longitude: tarLon
+    //                     },
+    //                     frequency: freqRelative
+    //                 }
+    //
+    //                 // Do not include instances where src and target are the same location
+    //                 if (!((srcLat === tarLat) && (srcLon === tarLon))) {
+    //                     traceroutesCondensed.push(dataPoint)
+    //                 }
+    //             })
+    //         })
+    //     })
+    // })
     // return traceroutesCondensed;
     return traceroutes_filtered;
 
