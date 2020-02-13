@@ -333,13 +333,15 @@ function condenseTracerouteData(traceroutes){
         console.log(tr)
         let pointA = tr.src.properties;
         let pointB = tr.target.properties;
-        let tr_src = {address: tr.tr.properties.src, dsts: {}};
-        let tr_dst = {address: tr.tr.properties.dst, traceroute: []};
+        let tr_src = {dsts: {}};
+        let tr_src_add = tr.tr.properties.src;
+        let tr_dst = {traceroute: []};
+        let tr_dst_add = tr.tr.properties.dst;
         console.log("pa", pointA, "pb", pointB, "s", tr_src, "d", tr_dst);
-        if (!traceroutesFormatted[tr_src.address]) traceroutesFormatted[tr_src.address] = tr_src;
-        if (!(traceroutesFormatted[tr_src.address].dsts[tr_dst.address])) traceroutesFormatted[tr_src.address].dsts[tr_dst.address] = tr_dst;
-        if (!(traceroutesFormatted[tr_src.address].dsts[tr_dst.address].traceroute)) traceroutesFormatted[tr_src.address].dsts[tr_dst.address].traceroute = [];
-        traceroutesFormatted[tr_src.address].dsts[tr_dst.address].traceroute.push({src: pointA, target: pointB});
+        if (!traceroutesFormatted[tr_src_add]) traceroutesFormatted[tr_src_add] = tr_src;
+        if (!(traceroutesFormatted[tr_src_add].dsts[tr_dst_add])) traceroutesFormatted[tr_src_add].dsts[tr_dst_add] = tr_dst;
+        if (!(traceroutesFormatted[tr_src_add].dsts[tr_dst_add].traceroute)) traceroutesFormatted[tr_src_add].dsts[tr_dst_add].traceroute = [];
+        traceroutesFormatted[tr_src_add].dsts[tr_dst_add].traceroute.push({src: pointA, target: pointB});
     })
 
 
