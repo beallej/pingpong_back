@@ -1,5 +1,5 @@
 const {IP_TYPES} = require("./constants.js");
-const {addTraceroutesToDb, getAllPingData} = require("./neo4jhelpers.js");
+const {addTraceroutesToDb, getAllPingData, getDstsForSrc} = require("./neo4jhelpers.js");
 const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
 const {parseTxt, parseTxtBatch, consdenseIPData, condenseTracerouteData} = require("./parsers");
 const express = require('express')
@@ -7,8 +7,8 @@ var bodyParser  = require("body-parser");
 
 
 const app = express();
+app.use(bodyParser.json({ limit: "50mb" }))
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
 
 
 /*** Add information from execution of script to gather traceroutes.
@@ -123,7 +123,33 @@ app.get('/traceroutes/all/condensed', async function (request, response) {
         console.log(err)
         return response.status(500).end();
     }
-})
+});
+
+
+app.get('/destinations/', async function (request, response) {
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header("Content-Type", "application/json")
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    try {
+        let callbackSuccess = (res) => {
+            let destinations = [...new Set(res)]; //filter out duplicates
+            return response.status(200).send(destinations)
+        };
+        let callbackErr = (err) => {
+            console.log(err)
+            return response.status(500).end();
+        };
+
+        let src = request.body.src;
+        getDstsForSrc(src, callbackSuccess, callbackErr);
+
+    } catch (err) {
+        console.log(err)
+        return response.status(500).end();
+    }
+});
+
+
 
 
 /***
@@ -247,19 +273,7 @@ app.get('/ip/all/address_only/windows', async function (request, response) {
     } catch (err) {
         return response.status(500).end();
     }
-})
-
-app.get('/ip/count', async function (request, response) {
-    response.header("Access-Control-Allow-Origin", "*");
-    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    try {
-        let allIpInfo = await getAllUserIpData();
-        return response.status(200).send(allIpInfo.length);
-    } catch (err) {
-        return response.status(500).end();
-    }
-})
-
+});
 app.listen(process.env.PORT || 5000, () =>{})
 
 
