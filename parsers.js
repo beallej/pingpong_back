@@ -327,13 +327,22 @@ function condenseTracerouteData(traceroutes){
 
         return valid;
     });
-    traceroutes_filtered = traceroutes_filtered.map((tr) => {
-        return {
-            src: tr.src.properties,
-            target: tr.target.properties,
-            tr: tr.tr.properties
-        }
-    });
+
+    let traceroutesFormatted = {};
+    traceroutes_filtered.forEach((tr) => {
+        let pointA = tr.src.properties;
+        let pointB = tr.target.properties;
+        let tr_src = tr.tr.properties.src;
+        tr_src.dsts = {};
+        let tr_dst = tr.tr.properties.dst;
+        tr_dst.traceroute = [];
+        if (!traceroutesFormatted[tr_src.address]) traceroutesFormatted[tr_src.address] = tr_src;
+        if (!(traceroutesFormatted[tr_src.address].dsts[tr_dst.address])) traceroutesFormatted[tr_src.address].dsts[tr_dst.address] = tr_dst;
+        if (!(traceroutesFormatted[tr_src.address].dsts[tr_dst.address].traceroute)) traceroutesFormatted[tr_src.address].dsts[tr_dst.address].traceroute = [];
+        traceroutesFormatted[tr_src.address].dsts[tr_dst.address].traceroute.push({src: pointA, target: pointB});
+    })
+
+
     /* Convert to obj with lat/lon key/value pair structure:
     * {
     *   src1_latitude: {
