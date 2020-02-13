@@ -209,7 +209,7 @@ app.get('/ip/all', async function (request, response) {
 })
 
 /***
- * Gets all the user ip addresses without extra info, concatenated with a comma. Used by the sh file to fetch the ips to traceroute.
+ * Gets all the ip addresses without extra info, concatenated with a comma. Used by the sh file to fetch the ips to traceroute.
  *
  * response body:
  *  "123.45.678,910.11.121,314.15.161"
@@ -220,6 +220,8 @@ app.get('/ip/all/address_only', async function (request, response) {
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let allIpInfo = await getAllUserIpData();
+        let allIntermediateIpInfo = await getAllIntermediateIpData();
+        allIpInfo = allIpInfo.concat(allIntermediateIpInfo);
         let justAddresses = allIpInfo.map((ip) => {return ip.address}).join(",");
         console.log("just addresses: ", justAddresses)
         return response.status(200).send(justAddresses);
