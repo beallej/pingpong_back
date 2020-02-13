@@ -97,17 +97,10 @@ async function insertUserIpWithLocation(ip) {
 
     //only save ips for which we have the latitude/longitude
     if (location.latitude && location.longitude){
-
-        //only save user ips in france
-        if (location.country_code !== "FR") {
-            console.log("ip " + ip + " not in france, located in " + location.country_code)
-            response.statusCode = 400;
-            response.statusMessage = "Ip not located in France, located in " + location.country_code;
-        } else {
-            dbRes = await saveToDb(ip, location.latitude, location.longitude, location.asn, location.isp, location.country_code, IP_TYPES.USER);
-            response.statusCode = 201;
-            response.statusMessage = "Ip address successfully added!"
-        }
+        
+        dbRes = await saveToDb(ip, location.latitude, location.longitude, location.asn, location.isp, location.country_code, IP_TYPES.USER);
+        response.statusCode = 201;
+        response.statusMessage = "Ip address successfully added!";
 
     } else {
         response.statusCode = 404;
