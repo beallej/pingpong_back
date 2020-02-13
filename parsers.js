@@ -335,6 +335,7 @@ function condenseTracerouteData(traceroutes){
         let pointB = tr.target.properties;
         let tr_src = {address: tr.tr.properties.src, dsts: {}};
         let tr_dst = {address: tr.tr.properties.dst, traceroute: []};
+        console.log("pa", pointA, "pb", pointB, "s", tr_src, "d", tr_dst);
         if (!traceroutesFormatted[tr_src.address]) traceroutesFormatted[tr_src.address] = tr_src;
         if (!(traceroutesFormatted[tr_src.address].dsts[tr_dst.address])) traceroutesFormatted[tr_src.address].dsts[tr_dst.address] = tr_dst;
         if (!(traceroutesFormatted[tr_src.address].dsts[tr_dst.address].traceroute)) traceroutesFormatted[tr_src.address].dsts[tr_dst.address].traceroute = [];
@@ -415,7 +416,8 @@ function condenseTracerouteData(traceroutes){
     //     })
     // })
     // return traceroutesCondensed;
-    return traceroutes_filtered;
+    console.log("TRaceroutes formattted: ", traceroutesFormatted)
+    return traceroutesFormatted;
 
 }
 module.exports = {parseTxt, consdenseIPData, condenseTracerouteData, parseTxtBatch: parseTxtBatch};
