@@ -333,10 +333,8 @@ function condenseTracerouteData(traceroutes){
         console.log(tr)
         let pointA = tr.src.properties;
         let pointB = tr.target.properties;
-        let tr_src = tr.tr.properties.src;
-        tr_src.dsts = {};
-        let tr_dst = tr.tr.properties.dst;
-        tr_dst.traceroute = [];
+        let tr_src = {address: tr.tr.properties.src, dsts: {}};
+        let tr_dst = {address: tr.tr.properties.dst, traceroute: []};
         if (!traceroutesFormatted[tr_src.address]) traceroutesFormatted[tr_src.address] = tr_src;
         if (!(traceroutesFormatted[tr_src.address].dsts[tr_dst.address])) traceroutesFormatted[tr_src.address].dsts[tr_dst.address] = tr_dst;
         if (!(traceroutesFormatted[tr_src.address].dsts[tr_dst.address].traceroute)) traceroutesFormatted[tr_src.address].dsts[tr_dst.address].traceroute = [];
