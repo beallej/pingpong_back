@@ -330,6 +330,7 @@ function condenseTracerouteData(traceroutes){
 
     let traceroutesFormatted = {};
     traceroutes_filtered.forEach((tr) => {
+        console.log(tr)
         let pointA = tr.src.properties;
         let pointB = tr.target.properties;
         let tr_src = tr.tr.properties.src;
