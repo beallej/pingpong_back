@@ -1,7 +1,7 @@
 const {IP_TYPES} = require("./constants.js");
-const {addTraceroutesToDb, getAllPingData, getDstsForSrc} = require("./neo4jhelpers.js");
+const {addTraceroutesToDb, getAllPingData, getDstsForSrc, getTracerouteForSrcDst} = require("./neo4jhelpers.js");
 const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
-const {parseTxt, parseTxtBatch, consdenseIPData, condenseTracerouteData, parseDstsForSrc} = require("./parsers");
+const {parseTxt, parseTxtBatch, consdenseIPData, condenseTracerouteData, parseDstsForSrc, formatTracerouteForOneSrcDstData} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
 
@@ -149,6 +149,30 @@ app.get('/:srcAddress/destinations/', async function (request, response) {
     }
 });
 
+
+app.get('/:srcAddress/:dstAddress/traceroute', async function (request, response) {
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header("Content-Type", "application/json")
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    try {
+        let callbackSuccess = (res) => {
+            let traceroutesFormatted = formatTracerouteForOneSrcDstData(res);
+            return response.status(200).send(traceroutesCondensed)
+        };
+        let callbackErr = (err) => {
+            console.log(err)
+            return response.status(500).end();
+        };
+
+        let src = request.params.srcAddress;
+        let dst = request.params.dstAddress;
+        getTracerouteForSrcDst(src, dst, callbackSuccess, callbackErr);
+
+    } catch (err) {
+        console.log(err)
+        return response.status(500).end();
+    }
+});
 
 
 
