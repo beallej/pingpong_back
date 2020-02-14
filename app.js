@@ -157,7 +157,7 @@ app.get('/:srcAddress/:dstAddress/traceroute', async function (request, response
     try {
         let callbackSuccess = (res) => {
             let traceroutesFormatted = formatTracerouteForOneSrcDstData(res);
-            return response.status(200).send(traceroutesCondensed)
+            return response.status(200).send(traceroutesFormatted)
         };
         let callbackErr = (err) => {
             console.log(err)
