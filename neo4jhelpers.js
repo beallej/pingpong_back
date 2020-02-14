@@ -27,7 +27,33 @@ async function getAllPingData(callbackSuccess, callbackErr){
  * ***/
 async function getDstsForSrc(src, callbackSuccess, callbackErr){
     await db.cypher({
-        query: "MATCH (src)-[tr:PINGS{src: \""+ src +"\"}]-(target) RETURN tr.dst"
+        query: "MATCH (pointA)-[tr:PINGS{src: {srcAddress}}]-(pointB) RETURN tr.dst",
+        params: {
+            srcAddress: src
+        }
+    }, (err, res) => {
+        if (res){
+            callbackSuccess(res);
+        }
+        if (err){
+            callbackErr(err)
+        }
+    });
+}
+
+/*** Gets all destinations pinged for a given src from db.
+ * params:
+ *      src: The src address
+ *      callbackSuccess: a function that takes a string (the results of the query, stringified) as a parameter
+ *      callbackErr: to handle error cases
+ * ***/
+async function getTracerouteForSrcDst(src, dst, callbackSuccess, callbackErr){
+    await db.cypher({
+        query: "MATCH (pointA)-[tr:PINGS{src: {srcAddress}, dst: {dstAddress}}]-(pointB) RETURN pointA, pointB",
+        params: {
+            srcAddress: src,
+            dstAddress: dst
+        }
     }, (err, res) => {
         if (res){
             callbackSuccess(res);
@@ -182,4 +208,4 @@ function fixData(address, lat, lon, isp, asn, country_code){
 }
 
 
-module.exports = {addTraceroutesToDb, getAllPingData, getDstsForSrc};
+module.exports = {addTraceroutesToDb, getAllPingData, getDstsForSrc, getTracerouteForSrcDst};
