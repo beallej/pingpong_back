@@ -422,7 +422,12 @@ function condenseTracerouteData(traceroutes){
     return traceroutesFormatted;
 
 }
-module.exports = {parseTxt, consdenseIPData, condenseTracerouteData, parseTxtBatch: parseTxtBatch};
-// var fs = require("fs");
-// var text = fs.readFileSync("./pingpong.txt", "utf-8");
-// console.log(JSON.stringify(parseTxtBatch(text)))
+
+function parseDstsForSrc(dsts){
+    let dstList = dsts.map((dst) => {return dst["tr.dst"]})
+    return [...new Set(dstList)];
+}
+
+
+
+module.exports = {parseTxt, consdenseIPData, condenseTracerouteData, parseTxtBatch: parseTxtBatch, parseDstsForSrc};
