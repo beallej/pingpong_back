@@ -425,6 +425,7 @@ function condenseTracerouteData(traceroutes){
 
 function formatTracerouteForOneSrcDstData(traceroutes) {
     //tr {src: {}, target: {}, tr: {properties :{src: 122.33..., target: 22.222}}}
+    console.log("TR", JSON.stringify(traceroutes))
     let traceroutes_filtered = traceroutes.filter((tr) => {
         let valid = true;
         let src = tr.src.properties;
