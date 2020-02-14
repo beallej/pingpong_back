@@ -1,7 +1,7 @@
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb, getAllPingData, getDstsForSrc} = require("./neo4jhelpers.js");
 const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
-const {parseTxt, parseTxtBatch, consdenseIPData, condenseTracerouteData} = require("./parsers");
+const {parseTxt, parseTxtBatch, consdenseIPData, condenseTracerouteData, parseDstsForSrc} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
 
@@ -126,13 +126,13 @@ app.get('/traceroutes/all/condensed', async function (request, response) {
 });
 
 
-app.get('/destinations/', async function (request, response) {
+app.get('/:srcAddress/destinations/', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Content-Type", "application/json")
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let callbackSuccess = (res) => {
-            let destinations = [...new Set(res)]; //filter out duplicates
+            let destinations = parseDstsForSrc(res) //filter out duplicates
             return response.status(200).send(destinations)
         };
         let callbackErr = (err) => {
@@ -140,7 +140,7 @@ app.get('/destinations/', async function (request, response) {
             return response.status(500).end();
         };
 
-        let src = request.body.src;
+        let src = request.params.srcAddress;
         getDstsForSrc(src, callbackSuccess, callbackErr);
 
     } catch (err) {
