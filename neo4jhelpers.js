@@ -49,7 +49,7 @@ async function getDstsForSrc(src, callbackSuccess, callbackErr){
  * ***/
 async function getTracerouteForSrcDst(src, dst, callbackSuccess, callbackErr){
     await db.cypher({
-        query: "MATCH (pointA)-[tr:PINGS{src: {srcAddress}, dst: {dstAddress}}]-(pointB) RETURN pointA, pointB",
+        query: "MATCH (src)-[tr:PINGS{src: {srcAddress}, dst: {dstAddress}}]-(target) RETURN src, target",
         params: {
             srcAddress: src,
             dstAddress: dst
