@@ -1,7 +1,7 @@
 
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb, getAllPingData, getDstsForSrc, getTracerouteForSrcDst, getSources} = require("./neo4jhelpers.js");
-const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
+const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG, fixUserIps} = require("./postgresHelpers");
 const {parseTxt, parseTxtBatch, consdenseIPData, condenseTracerouteData, parseDstsForSrc, formatTracerouteForOneSrcDstData, parseSources} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
@@ -325,3 +325,14 @@ app.listen(process.env.PORT || 5000, () =>{})
 
 
 
+app.get('/fix', async function (request, response) {
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    try {
+        fixUserIps();
+        return response.status(200).end();
+    } catch (err) {
+        return response.status(500).end();
+    }
+});
+app.listen(process.env.PORT || 5000, ()
