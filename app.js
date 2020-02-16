@@ -320,10 +320,6 @@ app.get('/ip/all/address_only/windows', async function (request, response) {
         return response.status(500).end();
     }
 });
-app.listen(process.env.PORT || 5000, () =>{})
-
-
-
 
 app.get('/fix', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
@@ -335,4 +331,10 @@ app.get('/fix', async function (request, response) {
         return response.status(500).end();
     }
 });
-app.listen(process.env.PORT || 5000, ()
+app.listen(process.env.PORT || 5000, () =>{})
+
+
+
+
+
+
