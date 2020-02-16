@@ -1,10 +1,8 @@
-import {getSources} from "./neo4jhelpers";
-import {parseSources} from "./parsers";
 
 const {IP_TYPES} = require("./constants.js");
-const {addTraceroutesToDb, getAllPingData, getDstsForSrc, getTracerouteForSrcDst} = require("./neo4jhelpers.js");
+const {addTraceroutesToDb, getAllPingData, getDstsForSrc, getTracerouteForSrcDst, getSources} = require("./neo4jhelpers.js");
 const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
-const {parseTxt, parseTxtBatch, consdenseIPData, condenseTracerouteData, parseDstsForSrc, formatTracerouteForOneSrcDstData} = require("./parsers");
+const {parseTxt, parseTxtBatch, consdenseIPData, condenseTracerouteData, parseDstsForSrc, formatTracerouteForOneSrcDstData, parseSources} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
 
