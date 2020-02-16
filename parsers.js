@@ -427,15 +427,15 @@ function formatTracerouteForOneSrcDstData(traceroutes) {
     //tr {src: {}, target: {}, tr: {properties :{src: 122.33..., target: 22.222}}}
     let traceroutes_filtered = traceroutes.filter((tr) => {
         let valid = true;
-        // let src = tr.src.properties;
-        //
-        // //do not include weird locations
-        // valid = valid && ((src.country_code === "FR") || (src.country_code === "CH"));
-        // let target = tr.target.properties;
-        // valid = valid && ((target.country_code === "FR") || (target.country_code === "CH"));
-        // // Do not include instances where src and target are the same location
-        // valid = valid && !((src.latitude === target.latitude)
-        //     && (src.longitude === target.longitude));
+        let src = tr.src.properties;
+
+        //do not include weird locations
+        valid = valid && ((src.country_code === "FR") || (src.country_code === "CH"));
+        let target = tr.target.properties;
+        valid = valid && ((target.country_code === "FR") || (target.country_code === "CH"));
+        // Do not include instances where src and target are the same location
+        valid = valid && !((src.latitude === target.latitude)
+            && (src.longitude === target.longitude));
 
         return valid;
     });
