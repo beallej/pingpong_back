@@ -215,29 +215,6 @@ async function getOneTracerouteLocationInfo(src, tr){
     return route;
 }
 
-async function fixUserIps(){
-    let userIPs = await getAllUserIpData();
-    let intermediateIPs = await getAllIntermediateIpData();
-    let intermediateDict = {};
-    intermediateIPs.map((ip) => {
-        intermediateDict[ip.address] = 1;
-    });
-    userIPs.forEach(async function(uip) {
-        if (intermediateDict[uip.address]) {
-            console.log("DUP: ", uip.address)
-            let query = `DELETE FROM IP_INFO WHERE address = '${uip.address}';`
-            console.log(query);
-            try {
-                const res = await client.query(query);
-                return res.rows;
-            } catch (err) {
-                console.log("error querying to db", err.stack)
-                return null;
-            }
-        }
-    })
-}
-
 
 module.exports = {getInfoForIp: getInfoForIpFromDb,
-    getTracerouteLocationInfo: getTraceroutesLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG: addTraceroutesToIpList, fixUserIps};
+    getTracerouteLocationInfo: getTraceroutesLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG: addTraceroutesToIpList};
