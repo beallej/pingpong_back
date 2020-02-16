@@ -224,7 +224,9 @@ async function fixUserIps(){
     });
     userIPs.forEach(async function(uip) {
         if (intermediateDict[uip.address]) {
+            console.log("DUP: ", uip.address)
             let query = `DELETE FROM IP_INFO WHERE address = ${uip.address};`
+            console.log(query);
             try {
                 const res = await client.query(query);
                 return res.rows;
