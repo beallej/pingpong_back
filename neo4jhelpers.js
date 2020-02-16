@@ -26,7 +26,7 @@ async function getAllPingData(callbackSuccess, callbackErr){
  * ***/
 async function getSources(callbackSuccess, callbackErr){
     await db.cypher({
-        query: "MATCH (src)-[tr:PINGS]-(dst) RETURN src",
+        query: "MATCH (src)-[tr:PINGS]-(dst) WHERE src.address = tr.src RETURN src",
     }, (err, res) => {
         if (res){
             callbackSuccess(res);
