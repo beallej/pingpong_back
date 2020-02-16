@@ -153,8 +153,21 @@ app.get('/:srcAddress/destinations/', async function (request, response) {
     response.header("Content-Type", "application/json")
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
-        let callbackSuccess = (res) => {
-            let destinations = parseDstsForSrc(res) //filter out duplicates
+        let callbackSuccess = async (res) => {
+            let destinationIps = parseDstsForSrc(res) //filter out duplicates
+            let userIps = await getAllUserIpData();
+            let intermediateIps = await getAllIntermediateIpData();
+            let allIps = {};
+            userIps.forEach((ipObj) => {
+                allIps[ipObj.address] = ipObj;
+            });
+            intermediateIps.forEach((ipObj) => {
+                allIps[ipObj.address] = ipObj;
+            });
+            let destinations = [];
+            destinationIps.forEach((ipAddr) => {
+                if (allIps[ipAddr]) destinations.push(allIps[ipAddr]);
+            });
             return response.status(200).send(destinations)
         };
         let callbackErr = (err) => {
