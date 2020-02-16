@@ -451,11 +451,11 @@ function formatTracerouteForOneSrcDstData(traceroutes) {
 function parseSources(sources) {
     let srcObj = {}
     let srcsFormatted = sources.map((src) => {
-        return src.src.properties})
+        return src.src.properties});
     srcsFormatted = srcsFormatted.filter((src) => {
        let exits = srcObj[src.address] || false;
        srcObj[src.address] = true;
-       return exits;
+       return !exits;
     });
     return srcsFormatted;
 }
