@@ -1,3 +1,6 @@
+import {getSources} from "./neo4jhelpers";
+import {parseSources} from "./parsers";
+
 const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb, getAllPingData, getDstsForSrc, getTracerouteForSrcDst} = require("./neo4jhelpers.js");
 const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
@@ -117,7 +120,7 @@ app.get('/traceroutes/all/condensed', async function (request, response) {
             return response.status(500).end();
         };
         console.log("start")
-        getAllPingData(callbackSuccess, callbackErr)
+        await getAllPingData(callbackSuccess, callbackErr)
 
     } catch (err) {
         console.log(err)
@@ -125,6 +128,27 @@ app.get('/traceroutes/all/condensed', async function (request, response) {
     }
 });
 
+app.get('/sources/', async function (request, response) {
+    response.header("Access-Control-Allow-Origin", "*");
+    response.header("Content-Type", "application/json")
+    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    try {
+        let callbackSuccess = (res) => {
+            let sources = parseSources(res) //filter out duplicates
+            return response.status(200).send(sources)
+        };
+        let callbackErr = (err) => {
+            console.log(err)
+            return response.status(500).end();
+        };
+
+        await getSources(callbackSuccess, callbackErr);
+
+    } catch (err) {
+        console.log(err)
+        return response.status(500).end();
+    }
+});
 
 app.get('/:srcAddress/destinations/', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");

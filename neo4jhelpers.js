@@ -19,6 +19,24 @@ async function getAllPingData(callbackSuccess, callbackErr){
     });
 }
 
+/*** Gets all ips that traceroutes were run from.
+ * params:
+ *      callbackSuccess: a function that takes a string (the results of the query, stringified) as a parameter
+ *      callbackErr: to handle error cases
+ * ***/
+async function getSources(callbackSuccess, callbackErr){
+    await db.cypher({
+        query: "MATCH (src)-[tr:PINGS]-(dst) RETURN src",
+    }, (err, res) => {
+        if (res){
+            callbackSuccess(res);
+        }
+        if (err){
+            callbackErr(err)
+        }
+    });
+}
+
 /*** Gets all destinations pinged for a given src from db.
  * params:
  *      src: The src address
@@ -208,4 +226,4 @@ function fixData(address, lat, lon, isp, asn, country_code){
 }
 
 
-module.exports = {addTraceroutesToDb, getAllPingData, getDstsForSrc, getTracerouteForSrcDst};
+module.exports = {addTraceroutesToDb, getAllPingData, getDstsForSrc, getTracerouteForSrcDst, getSources};

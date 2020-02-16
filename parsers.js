@@ -448,6 +448,18 @@ function formatTracerouteForOneSrcDstData(traceroutes) {
     })
 }
 
+function parseSources(sources) {
+    let srcObj = {}
+    let srcsFormatted = sources.map((src) => {
+        return src.src.properties})
+    srcsFormatted = srcsFormatted.filter((src) => {
+       let exits = srcObj[src.address] || false;
+       srcObj[src.address] = true;
+       return exits;
+    });
+    return srcsFormatted;
+}
+
 function parseDstsForSrc(dsts){
     let dstList = dsts.map((dst) => {return dst["tr.dst"]})
     return [...new Set(dstList)];
@@ -455,4 +467,4 @@ function parseDstsForSrc(dsts){
 
 
 
-module.exports = {parseTxt, consdenseIPData, condenseTracerouteData, parseTxtBatch: parseTxtBatch, parseDstsForSrc, formatTracerouteForOneSrcDstData};
+module.exports = {parseTxt, consdenseIPData, condenseTracerouteData, parseTxtBatch: parseTxtBatch, parseDstsForSrc, formatTracerouteForOneSrcDstData, parseSources};
