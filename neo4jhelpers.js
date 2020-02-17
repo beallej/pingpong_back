@@ -45,7 +45,7 @@ async function getSources(callbackSuccess, callbackErr){
  * ***/
 async function getDstsForSrc(src, callbackSuccess, callbackErr){
     await db.cypher({
-        query: "MATCH (pointA)-[tr:PINGS{src: {srcAddress}}]-(pointB) RETURN tr.dst",
+        query: "MATCH (src)-[tr:PINGS{src: {srcAddress}}]-(dst) WHERE dst.address = tr.dst RETURN dst",
         params: {
             srcAddress: src
         }

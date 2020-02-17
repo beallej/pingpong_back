@@ -404,8 +404,15 @@ function parseSources(sources) {
  * @returns {any[]}
  */
 function parseDstsForSrc(dsts){
-    let dstList = dsts.map((dst) => {return dst["tr.dst"]})
-    return [...new Set(dstList)];
+    let dstObj = {}
+    let dstsFormatted = dsts.map((dst) => {
+        return dst.dst.properties});
+    dstsFormatted = dstsFormatted.filter((dst) => {
+        let exits = dstObj[dst.address] || false;
+        dstObj[dst.address] = true;
+        return !exits;
+    });
+    return dstsFormatted;
 }
 
 
