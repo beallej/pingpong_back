@@ -401,7 +401,20 @@ function parseSources(sources) {
 /***
  * Formats a list of destinations Pinged for a given source
  * @param dsts
- * @returns {any[]}
+ * [
+ *      {"dst":
+ *          {
+ *              "properties" :  {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>},
+ *              ...
+ *          }
+ *      },
+ *      ...
+ *    ]
+ * @returns
+ *    [
+ *      {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>},
+ *      ...
+ *    ]
  */
 function parseDstsForSrc(dsts){
     let dstObj = {}

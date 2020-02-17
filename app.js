@@ -181,21 +181,6 @@ app.get('/:srcAddress/destinations/', async function (request, response) {
 
             //filter out duplicates
             let destinations = parseDstsForSrc(res);
-            console.log(destinations);
-            // //recuperate entire location object from just the address
-            // let userIps = await getAllUserIpData();
-            // let intermediateIps = await getAllIntermediateIpData();
-            // let allIps = {};
-            // userIps.forEach((ipObj) => {
-            //     allIps[ipObj.address] = ipObj;
-            // });
-            // intermediateIps.forEach((ipObj) => {
-            //     allIps[ipObj.address] = ipObj;
-            // });
-            // let destinations = [];
-            // destinationIps.forEach((ipAddr) => {
-            //     if (allIps[ipAddr]) destinations.push(allIps[ipAddr]);
-            // });
             return response.status(200).send(destinations)
         };
         let callbackErr = (err) => {
