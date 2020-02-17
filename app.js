@@ -1,11 +1,8 @@
-
-const {IP_TYPES} = require("./constants.js");
 const {addTraceroutesToDb, getAllPingData, getDstsForSrc, getTracerouteForSrcDst, getSources} = require("./neo4jhelpers.js");
 const {getTracerouteLocationInfo, insertUserIpWithLocation, getAllUserIpData, getAllIntermediateIpData, addTraceroutesToIpListPG} = require("./postgresHelpers");
 const {parseTxt, parseTxtBatch, consdenseIPData, condenseTracerouteData, parseDstsForSrc, formatTracerouteForOneSrcDstData, parseSources} = require("./parsers");
 const express = require('express')
 var bodyParser  = require("body-parser");
-
 
 const app = express();
 app.use(bodyParser.json({limit: '50mb'}));
@@ -52,6 +49,10 @@ app.post('/traceroute/windows',async function(request, response){
 
 })
 
+/***
+ * Inserts parsed traceroute data into the dbs
+ * @param traceroutesParsed the parsed traceroute data
+ */
 async function handleTraceRouteData(traceroutesParsed){
 
     console.log("TRACEROUTES", JSON.stringify(traceroutesParsed))
@@ -85,21 +86,24 @@ app.post('/ip/add',async function(request, response){
 /*** RETURN A LIST OF ALL THE TRACEROUTES. Data is condensed to lat/lon points (multiple ip addresses can share the same location),
  * and the frequency of the given path taken (how often is is taken compared to other paths) is also returned.
  *
- *response body :
- * {
- *     [
- *         {src:
- *              {latitude: 48.6,
-                 longitude: 2.3
-                },
-            target: {
-                latitude: 45.6,
-                longitude: 3.3
-            },
-            frequency: 0.4
-           },
- *     ]
- * }
+ *  Response body:
+ * {<Source address>:
+ *      {"dsts":
+ *          {<Destination address>:
+ *              {"traceroute":
+ *                  [
+     *                  {
+     *                      "src":
+     *                          {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>},
+     *                      "target":
+     *                          {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>}
+     *                   },
+     *                   ....
+ *                  ]
+ *              }
+ *          }
+ *      }
+ *  }
  * ***/
 app.get('/traceroutes/all/condensed', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
@@ -108,16 +112,13 @@ app.get('/traceroutes/all/condensed', async function (request, response) {
     try {
         let callbackSuccess = (res) => {
             let traceroutes = res;
-            console.log("traceroutes fetched")
             let traceroutesCondensed = condenseTracerouteData(traceroutes);
-            console.log("traceroutes condensed")
             return response.status(200).send(traceroutesCondensed)
         };
         let callbackErr = (err) => {
             console.log(err)
             return response.status(500).end();
         };
-        console.log("start")
         await getAllPingData(callbackSuccess, callbackErr)
 
     } catch (err) {
@@ -126,6 +127,12 @@ app.get('/traceroutes/all/condensed', async function (request, response) {
     }
 });
 
+/***
+ * Gets a list of all the ips that ran traceroutes
+ * Response body:
+ * [{"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>},
+ * ...]
+ ***/
 app.get('/sources/', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Content-Type", "application/json")
@@ -148,13 +155,34 @@ app.get('/sources/', async function (request, response) {
     }
 });
 
+/***
+ * Gets a list of Ips pinged by a given source IP address
+ * Request Path Param:
+ *      srcAddress: the ip address of the source
+ * Response Body:
+ * [
+ {
+        "address": <ip address>,
+        "latitude": <latitude>,
+        "longitude": <longitude>,
+        "asn":<ex. "AS15557">
+        "isp":<ex. "SFR SA">,
+        "country_code": <ex."FR">
+    },
+    ...
+ ]
+ ***/
 app.get('/:srcAddress/destinations/', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Content-Type", "application/json")
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let callbackSuccess = async (res) => {
-            let destinationIps = parseDstsForSrc(res) //filter out duplicates
+
+            //filter out duplicates
+            let destinationIps = parseDstsForSrc(res);
+
+            //recuperate entire location object from just the address
             let userIps = await getAllUserIpData();
             let intermediateIps = await getAllIntermediateIpData();
             let allIps = {};
@@ -179,23 +207,51 @@ app.get('/:srcAddress/destinations/', async function (request, response) {
         getDstsForSrc(src, callbackSuccess, callbackErr);
 
     } catch (err) {
-        console.log(err)
+        console.log(err);
         return response.status(500).end();
     }
 });
 
-
+/***
+ * For a given source and destination IP, gets the traceroute data between them.
+ * * Request Path Params:
+ *      srcAddress: the ip address of the source
+ *      dstAddress: the ip address of the destination
+ *   Response Body:
+ *   {
+        "src": {
+            "address": <ip address>,
+            "latitude": <latitude>,
+            "longitude": <longitude>,
+            "asn":<ex. "AS15557">
+            "isp":<ex. "SFR SA">,
+            "country_code": <ex."FR">
+        },
+        "target": {
+            "address": <ip address>,
+            "latitude": <latitude>,
+            "longitude": <longitude>,
+            "asn":<ex. "AS15557">
+            "isp":<ex. "SFR SA">,
+            "country_code": <ex."FR">
+        }
+    },
+    ...
+ *
+ ***/
 app.get('/:srcAddress/:dstAddress/traceroute', async function (request, response) {
     response.header("Access-Control-Allow-Origin", "*");
     response.header("Content-Type", "application/json")
     response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     try {
         let callbackSuccess = (res) => {
+
+            //format raw data
             let traceroutesFormatted = formatTracerouteForOneSrcDstData(res);
             return response.status(200).send(traceroutesFormatted)
         };
         let callbackErr = (err) => {
-            console.log(err)
+            console.log(err);
             return response.status(500).end();
         };
 
@@ -291,10 +347,10 @@ app.get('/ip/all', async function (request, response) {
     } catch (err) {
         return response.status(500).end();
     }
-})
+});
 
 /***
- * Gets all the ip addresses without extra info, concatenated with a comma. Used by the sh file to fetch the ips to traceroute.
+ * Gets all the ip addresses without extra info, concatenated with a comma. Used by the sh and bat files to fetch the ips to traceroute.
  *
  * response body:
  *  "123.45.678,910.11.121,314.15.161"
@@ -313,28 +369,8 @@ app.get('/ip/all/address_only', async function (request, response) {
     } catch (err) {
         return response.status(500).end();
     }
-})
-
-/***
- * Gets all the user ip addresses without extra info. Used by the windows bat file to fetch the ips to traceroute.
- *
- * response body:
- *  [123.45.678, 910.11.121, 314.15.161]
- *
- * ***/
-app.get('/ip/all/address_only/windows', async function (request, response) {
-    response.header("Access-Control-Allow-Origin", "*");
-    response.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    try {
-        let allIpInfo = await getAllUserIpData();
-        let justAddresses = allIpInfo.map((ip) => {return ip.address})
-        return response.status(200).send(justAddresses);
-    } catch (err) {
-        return response.status(500).end();
-    }
 });
-
-app.listen(process.env.PORT || 5000, () =>{})
+app.listen(process.env.PORT || 5000, () =>{});
 
 
 

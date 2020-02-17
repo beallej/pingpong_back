@@ -56,18 +56,15 @@ function parseTxtBatch(txtRaw){
     let srcRegEx = /_SRC_(.*)_END_SRC_/;
     let srcMatches = srcRegEx.exec(txt);
     let src = srcMatches[1].trim();
-    console.log("SRC: ", srcMatches);
 
     //set up response obj
     let resJSON = {}
     resJSON["src"] = src;
     resJSON["traceroutes"] = [];
 
-
     //parse traceroutes
     let result;
     let trRegEx = /_BEGIN_([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})_TRACEROUTE_(.*)_END_(\1)_TRACEROUTE_/g;
-
 
     //for each traceroute
     while (result = trRegEx.exec(txt)) {
@@ -76,60 +73,7 @@ function parseTxtBatch(txtRaw){
         let tr = result[2];
 
         // //parse dst from traceroute
-        // let dstRegEx =  /__DST__(.*)__END_DST__/;
-        // let dstRes = dstRegEx.exec(tr);
-        // let dst = dstRes[1].trim();
         let dst = result[1];
-
-        //parse traceroute body
-        let trObj = {dst: dst, route: []};
-        let regExAddress = /  ([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})/g;
-        let addressResult;
-
-        //parse out addresses found
-        while(addressResult = regExAddress.exec(tr)) {
-            console.log(addressResult)
-            trObj.route.push(addressResult[1])
-        }
-        resJSON.traceroutes.push(trObj)
-    }
-    return resJSON;
-
-
-
-}
-
-function parseTxtBatch2(txtRaw){
-    //remove new line chars (if they exist, different for different OS)
-    let txt = txtRaw.replace(/\n|\r/g,'');
-
-    //parse src ip
-    let srcRegEx = /_SRC_(.*)_END_SRC_/;
-    let srcMatches = srcRegEx.exec(txt);
-    let src = srcMatches[1].trim();
-    console.log("SRC: ", srcMatches);
-
-    //set up response obj
-    let resJSON = {}
-    resJSON["src"] = src;
-    resJSON["traceroutes"] = [];
-
-
-    //parse traceroutes
-    let result;
-    let trRegEx = /termination(.*?)raire d/g;
-
-
-    //for each traceroute
-    while (result = trRegEx.exec(txt)) {
-
-        //tr is one traceroute as a raw string
-        let tr = result[1];
-
-        //parse dst from traceroute
-        let dstRegEx =  /ers (.*)avec/;
-        let dstRes = dstRegEx.exec(tr);
-        let dst = dstRes[1].trim();
 
         //parse traceroute body
         let trObj = {dst: dst, route: []};
@@ -277,42 +221,56 @@ function consdenseIPData(userIps, intermediateIps){
  *  param: traceroutes: results from neo4j query getAllPingData (this is callbackSuccess)
  *      [
  *          {
- *              src : {
+ *              src : {    // node representing src IP in given hop
  *                  properties : {
  *                      latitude: 44.3,
  *                      longitude: 2.4,
  *                      ...
  *                  }
  *              },
- *              target: {
+ *              target: {   // node representing target IP in given hop
  *                  properties : {
  *                      latitude: 44.3,
  *                      longitude: 2.4,
  *                      ...
  *                  }
+ *              },
+ *              tr: {
+ *                  properties : {
+ *                      {
+ *                          src: <ip address of src of tracerotue>,
+ *                          target: <ip address of target of traceroute>
+ *                      }
+ *                  }
  *              }
+ *
  *          }
  *      ]
  *
  *
  *  Returns:
- *  [
- {
-            src: {
-                latitude: 44.4,
-                longitude: 2.3
-            }
-            target: {
-                latitude: 45.3,
-                longitude: 2.4
-            },
-            frequency: 0.03
-         },
- ...
- ]
+ *  {<Source address>:
+ *      {"dsts":
+ *          {<Destination address>:
+ *              {"traceroute":
+ *                  [
+ *                  {
+ *                      "src":
+ *                          {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>},
+ *                      "target":
+ *                          {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>}
+ *                   },
+ *                   ....
+ *                  ]
+ *              }
+ *          }
+ *      }
+ *  }
  *
  * ***/
 function condenseTracerouteData(traceroutes){
+
+    //tr {src: {}, target: {}, tr: {properties :{src: 122.33..., target: 22.222}}}
     let traceroutes_filtered = traceroutes.filter((tr) => {
         let valid = true;
         let src = tr.src.properties;
@@ -331,98 +289,59 @@ function condenseTracerouteData(traceroutes){
     let traceroutesFormatted = {};
     traceroutes_filtered.forEach((tr) => {
         console.log(tr)
+
+        //Given this traceroute, format the data
+        //TR_SRC -> point0 -> point1 -> .... -> pointA -> pointB ->.... -> pointN -> TR_DEST
         let pointA = tr.src.properties;
         let pointB = tr.target.properties;
         let tr_src = {dsts: {}};
         let tr_src_add = tr.tr.properties.src;
         let tr_dst = {traceroute: []};
         let tr_dst_add = tr.tr.properties.dst;
-        console.log("pa", pointA, "pb", pointB, "s", tr_src, "d", tr_dst);
+
+        console.log("point A: ", pointA, "point B: ", pointB, "tr source: ", tr_src, "tr dest: ", tr_dst);
         if (!traceroutesFormatted[tr_src_add]) traceroutesFormatted[tr_src_add] = tr_src;
         if (!(traceroutesFormatted[tr_src_add].dsts[tr_dst_add])) traceroutesFormatted[tr_src_add].dsts[tr_dst_add] = tr_dst;
         if (!(traceroutesFormatted[tr_src_add].dsts[tr_dst_add].traceroute)) traceroutesFormatted[tr_src_add].dsts[tr_dst_add].traceroute = [];
         traceroutesFormatted[tr_src_add].dsts[tr_dst_add].traceroute.push({src: pointA, target: pointB});
-    })
+    });
 
-
-    /* Convert to obj with lat/lon key/value pair structure:
-    * {
-    *   src1_latitude: {
-    *       src1_longitude: {
-    *           target1_latitude: {
-    *               target1_longitude : <number of times we saw a hop from (src1_latitude, src1_longitude) to (target1_latitude, target1_longitude)>
-    *           },
-    *           ....
-    *       },
-    *       ...
-    *   },
-    *   ...
-    * }
-    * */
-    // let traceroutesObj = {}
-    // traceroutes_filtered.map((tr) => {
-    //     let traceroute_instance = tr.tr.properties;
-    //     let src = tr.src.properties;
-    //     let target = tr.target.properties;
-    //     if (!traceroutesObj[src.latitude]) traceroutesObj[src.latitude] = {};
-    //     if (!traceroutesObj[src.latitude][src.longitude]) traceroutesObj[src.latitude][src.longitude] = {};
-    //     if (!traceroutesObj[src.latitude][src.longitude][target.latitude]) traceroutesObj[src.latitude][src.longitude][target.latitude] = {};
-    //     if (!traceroutesObj[src.latitude][src.longitude][target.latitude][target.longitude]) traceroutesObj[src.latitude][src.longitude][target.latitude][target.longitude] = 0;
-    //     traceroutesObj[src.latitude][src.longitude][target.latitude][target.longitude] += 1;
-    // })
-    // let traceroutesCondensed=[]
-
-    /* Create a data point for each (src_lat, src_lon), (target_lat, target_lon) combination,
-    and add the relative frequecy that this path was taken compared to others.
-
-    [
-        {
-            src: {
-                latitude: 44.4,
-                longitude: 2.3
-            }
-            target: {
-                latitude: 45.3,
-                longitude: 2.4
-            },
-            frequency: 0.03
-         },
-         ...
-     ]
-
-    */
-    // Object.keys(traceroutesObj).map((srcLat) => {
-    //     Object.keys(traceroutesObj[srcLat]).map((srcLon) => {
-    //         Object.keys(traceroutesObj[srcLat][srcLon]).map((tarLat) => {
-    //             Object.keys(traceroutesObj[srcLat][srcLon][tarLat]).map((tarLon) => {
-    //                 let freqRaw = traceroutesObj[srcLat][srcLon][tarLat][tarLon];
-    //                 let freqRelative = freqRaw/traceroutes.length;
-    //                 let dataPoint = {
-    //                     src: {
-    //                         latitude: srcLat,
-    //                         longitude: srcLon
-    //                     },
-    //                     target: {
-    //                         latitude: tarLat,
-    //                         longitude: tarLon
-    //                     },
-    //                     frequency: freqRelative
-    //                 }
-    //
-    //                 // Do not include instances where src and target are the same location
-    //                 if (!((srcLat === tarLat) && (srcLon === tarLon))) {
-    //                     traceroutesCondensed.push(dataPoint)
-    //                 }
-    //             })
-    //         })
-    //     })
-    // })
-    // return traceroutesCondensed;
-    console.log("TRaceroutes formattted: ", traceroutesFormatted)
+    console.log("Traceroutes formattted: ", traceroutesFormatted);
     return traceroutesFormatted;
 
 }
 
+/***
+ * Formates traceroute data for one source and destination
+ * @param traceroutes
+ *
+ * * [
+ *     {
+ *         "src":
+ *            {
+ *              "properties": {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>},
+ *              ...
+ *            }
+ *         "target":
+ *            {
+ *              "properties": {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>},
+ *              ...
+ *            }
+ *         },
+ *         ....
+ *  ]
+ *
+ * @returns
+ * [
+ *     {
+ *         "src":
+ *            {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>},
+ *         "target":
+ *             {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>}
+ *         },
+ *         ....
+ *  ]
+ */
 function formatTracerouteForOneSrcDstData(traceroutes) {
     //tr {src: {}, target: {}, tr: {properties :{src: 122.33..., target: 22.222}}}
     let traceroutes_filtered = traceroutes.filter((tr) => {
@@ -448,6 +367,24 @@ function formatTracerouteForOneSrcDstData(traceroutes) {
     })
 }
 
+/***
+ * Formats List of source ips
+ * @param sources
+ * [
+ *      {"src":
+ *          {
+ *              "properties" :  {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>},
+ *              ...
+ *          }
+ *      },
+ *      ...
+ *    ]
+ * @returns
+ *    [
+ *      {"country_code":<ex. "FR">,"address":<ip address>,"isp":<ex. "SFR SA">,"latitude":<latitude>,"asn":<ex. "AS15557">,"longitude":<longitude>},
+ *      ...
+ *    ]
+ */
 function parseSources(sources) {
     let srcObj = {}
     let srcsFormatted = sources.map((src) => {
@@ -460,6 +397,12 @@ function parseSources(sources) {
     return srcsFormatted;
 }
 
+
+/***
+ * Formats a list of destinations Pinged for a given source
+ * @param dsts
+ * @returns {any[]}
+ */
 function parseDstsForSrc(dsts){
     let dstList = dsts.map((dst) => {return dst["tr.dst"]})
     return [...new Set(dstList)];
